@@ -1,0 +1,29 @@
+# fly.toml — greekbook deployment
+app = "greekbook-spilios"
+primary_region = "ams"
+
+[build]
+
+[env]
+  GREEKBOOK_HOST = "0.0.0.0"
+
+[http_service]
+  internal_port = 8080
+  force_https   = true
+  auto_stop_machines  = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type       = "requests"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  size   = "shared-cpu-1x"
+  memory = "512mb"
+
+[[mounts]]
+  source      = "greekbook_data"
+  destination = "/data"
+  initial_size = "1gb"

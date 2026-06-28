@@ -1,0 +1,9 @@
+# INTRODUCTION
+
+PERHAPS the Sentiments contained in the following Pages, are not yet sufficiently fashionable to procure them general favor; a long habit of not thinking a Thing wrong, gives it a superficial appearance of being right, and raises at first a formidable outcry in defence of Custom. But the tumult soon subsides. Time makes more converts than Reason.
+
+As a long and violent abuse of Power, is generally the means of calling the right of it in question (and in matters too which might never have been thought of, had not the Sufferers been aggravated into the enquiry) and as the King of England hath undertaken in his own right, to support the Parliament in what he calls theirs, and as the good People of this Country are grievously oppressed by the combination, they have an undoubted privilege to enquire into the pretensions of both, and equally to reject the usurpation of either.
+
+IN the following Sheets, the Author hath studiously avoided every thing which is personal among ourselves. Compliments as well as Censure to individuals make no part thereof. The wise and the worthy, need not the triumph of a pamphlet; and those whose sentiments are injudicious, or unfriendly, will cease of themselves, unless too much pains are bestowed upon their conversion.
+
+The cause of America is in a great measure the cause of all mankind. Many circumstances have, and will arise, which are not local, but universal, and through which the principles of all lovers of mankind are affected, and in the event of which, their affections are interested. The laying a country desolate with fire and sword, declaring war against the natural rights of all mankind, and extirpating the defenders thereof from the face of the earth, is the concern of every man to whom nature hath given the power of feeling; of which class, regardless of party censure, is the AUTHOR.

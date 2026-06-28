@@ -1,0 +1,10 @@
+title: Common Sense
+subtitle: Addressed to the Inhabitants of America
+author: Thomas Paine
+
+language: en
+theme: sepia
+page_size: A5
+
+parts_dir: parts
+output: common_sense.pdf

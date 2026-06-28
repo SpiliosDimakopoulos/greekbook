@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>greekbook — νέο βιβλίο</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1f2e; --paper: #f0ede8; --accent: #8b4513;
+    --line: #e2ddd6; --muted: #9a948e; --panel: #fdfcfa;
+    --success: #2e7d4f; --error: #c0392b;
+    --font-ui: 'Inter', -apple-system, "Segoe UI", sans-serif;
+    --font-serif: 'Lora', Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-ui);
+    background: var(--paper); color: var(--ink);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 2rem 1rem;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .shell {
+    width: 100%; max-width: 560px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  }
+
+  /* Progress bar */
+  .progress-rail {
+    height: 3px; background: var(--line);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* Header */
+  .wiz-header {
+    padding: 1.6rem 2rem 1rem;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: .8rem;
+  }
+  .wiz-step-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent); opacity: .85;
+  }
+  .wiz-title {
+    font-size: 1.15rem; font-weight: 700; color: var(--ink);
+  }
+
+  /* Body */
+  .wiz-body { padding: 1.6rem 2rem; min-height: 260px; }
+
+  /* Fields */
+  .field { margin-bottom: 1.1rem; }
+  .field label {
+    display: block; font-size: .78rem; font-weight: 600;
+    color: var(--muted); margin-bottom: .35rem; letter-spacing: .02em;
+  }
+  .field input, .field select {
+    width: 100%; padding: .55rem .7rem;
+    border: 1.5px solid var(--line); border-radius: 8px;
+    font-size: .95rem; background: var(--paper);
+    color: var(--ink); transition: border-color .15s;
+    outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field input::placeholder { color: #bbb; }
+
+  /* Language cards */
+  .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+  .lang-card {
+    border: 2px solid var(--line); border-radius: 10px;
+    padding: 1rem 1.2rem; cursor: pointer;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .lang-card:hover { border-color: var(--accent); }
+  .lang-card.selected { border-color: var(--accent); background: #fdf5f0; }
+  .lang-card .lang-flag { font-size: 1.8rem; line-height: 1; margin-bottom: .4rem; }
+  .lang-card .lang-name { font-weight: 700; font-size: .95rem; }
+  .lang-card .lang-desc { font-size: .76rem; color: var(--muted); margin-top: .15rem; }
+
+  /* Theme cards */
+  .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .7rem; }
+  .theme-card {
+    border: 2px solid var(--line); border-radius: 10px;
+    overflow: hidden; cursor: pointer;
+    transition: border-color .15s, transform .15s;
+    user-select: none;
+  }
+  .theme-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .theme-card.selected { border-color: var(--accent); }
+  .theme-preview {
+    height: 90px; position: relative; overflow: hidden;
+  }
+  /* Cover mini-preview drawn with CSS */
+  .theme-preview .cover-bg {
+    position: absolute; inset: 0;
+  }
+  .theme-preview .cover-lines {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+  }
+  .theme-preview .cover-title-bar {
+    height: 7px; border-radius: 3px; width: 70%;
+    opacity: .9;
+  }
+  .theme-preview .cover-sub-bar {
+    height: 4px; border-radius: 2px; width: 50%;
+    opacity: .6;
+  }
+  .theme-preview .cover-author-bar {
+    height: 4px; border-radius: 2px; width: 45%;
+    opacity: .5; margin-top: 6px;
+  }
+  .theme-preview .cover-frame {
+    position: absolute; inset: 5px;
+    border-radius: 4px;
+  }
+  .theme-label {
+    padding: .45rem .6rem;
+    font-size: .78rem; font-weight: 600;
+    border-top: 1px solid var(--line);
+  }
+  .theme-label span { font-size: .68rem; font-weight: 400; color: var(--muted); display: block; }
+
+  /* Page size */
+  .size-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+  .size-card {
+    border: 2px solid var(--line); border-radius: 8px;
+    padding: .6rem .5rem; text-align: center; cursor: pointer;
+    transition: border-color .15s, background .15s; user-select: none;
+  }
+  .size-card:hover { border-color: var(--accent); }
+  .size-card.selected { border-color: var(--accent); background: #fdf5f0; }
+  .size-card .size-icon {
+    margin: 0 auto .3rem;
+    border: 1.5px solid currentColor;
+    border-radius: 1px; opacity: .6;
+  }
+  .size-card .size-name { font-weight: 700; font-size: .82rem; }
+  .size-card .size-dim  { font-size: .68rem; color: var(--muted); }
+
+  /* First chapter */
+  .first-chapter-wrap { position: relative; }
+  textarea {
+    width: 100%; min-height: 140px;
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: .7rem .8rem; font-family: Georgia, serif;
+    font-size: .92rem; line-height: 1.65; resize: vertical;
+    background: #fdfcf9; color: var(--ink); outline: none;
+    transition: border-color .15s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  .part-filename-hint {
+    font-size: .72rem; color: var(--muted); margin-top: .4rem;
+  }
+
+  /* Footer nav */
+  .wiz-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.1rem 2rem; border-top: 1px solid var(--line);
+    background: #fafaf8;
+  }
+  .btn {
+    padding: .55rem 1.4rem; border-radius: 8px; font-size: .9rem;
+    font-weight: 600; cursor: pointer; border: none; transition: opacity .15s;
+  }
+  .btn:disabled { opacity: .35; cursor: default; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:not(:disabled):hover { opacity: .85; }
+  .btn-ghost {
+    background: none; color: var(--muted);
+    border: 1.5px solid var(--line);
+  }
+  .btn-ghost:hover { color: var(--ink); border-color: #aaa; }
+  .dot-nav { display: flex; gap: .45rem; align-items: center; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--line); transition: background .2s, transform .2s;
+  }
+  .dot.active { background: var(--accent); transform: scale(1.3); }
+
+  /* Success state */
+  .success-screen {
+    text-align: center; padding: 2.5rem 2rem;
+    display: none; flex-direction: column; align-items: center; gap: 1rem;
+  }
+  .success-screen.show { display: flex; }
+  .success-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #e8f5ee; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+  }
+  .success-screen h2 { font-size: 1.2rem; font-weight: 700; }
+  .success-screen p { color: var(--muted); font-size: .88rem; max-width: 320px; }
+  .btn-big {
+    padding: .75rem 2rem; border-radius: 10px; font-size: 1rem;
+    font-weight: 700; background: var(--accent); color: #fff;
+    border: none; cursor: pointer; transition: opacity .15s; margin-top: .5rem;
+  }
+  .btn-big:hover { opacity: .85; }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+
+  <!-- Progress -->
+  <div class="progress-rail">
+    <div class="progress-fill" id="progress" style="width:25%"></div>
+  </div>
+
+  <!-- Step header -->
+  <div class="wiz-header">
+    <span class="wiz-step-label" id="step-label">Βήμα 1 από 4</span>
+    <span class="wiz-title" id="step-title">Ποιο βιβλίο γράφεις;</span>
+  </div>
+
+  <!-- Steps -->
+  <div class="wiz-body" id="wiz-body">
+
+    <!-- STEP 1: Book info -->
+    <div id="step-1">
+      <div class="field">
+        <label>Τίτλος βιβλίου</label>
+        <input id="f-title" type="text" placeholder="π.χ. Το Ταξίδι της Ελένης" autocomplete="off" autofocus>
+      </div>
+      <div class="field">
+        <label>Όνομα συγγραφέα</label>
+        <input id="f-author" type="text" placeholder="π.χ. Νίκος Παπαδόπουλος">
+      </div>
+      <div class="field">
+        <label>Υπότιτλος <span style="font-weight:400;color:#bbb">(προαιρετικό)</span></label>
+        <input id="f-subtitle" type="text" placeholder="π.χ. Μυθιστόρημα">
+      </div>
+    </div>
+
+    <!-- STEP 2: Language + Page size -->
+    <div id="step-2" style="display:none">
+      <div class="field" style="margin-bottom:1.3rem">
+        <label>Γλώσσα κειμένου</label>
+        <div class="lang-grid">
+          <div class="lang-card selected" data-lang="el" onclick="selectLang(this)">
+            <div class="lang-flag">🇬🇷</div>
+            <div class="lang-name">Ελληνικά</div>
+            <div class="lang-desc">Αυτόματη ελληνική ενοποίηση & κεφαλαία</div>
+          </div>
+          <div class="lang-card" data-lang="en" onclick="selectLang(this)">
+            <div class="lang-flag">🇬🇧</div>
+            <div class="lang-name">English</div>
+            <div class="lang-desc">English hyphenation & parts</div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Μέγεθος σελίδας</label>
+        <div class="size-grid">
+          <div class="size-card selected" data-size="A5" onclick="selectSize(this)">
+            <div class="size-icon" style="width:22px;height:31px"></div>
+            <div class="size-name">A5</div>
+            <div class="size-dim">148 × 210 mm</div>
+          </div>
+          <div class="size-card" data-size="A4" onclick="selectSize(this)">
+            <div class="size-icon" style="width:24px;height:34px"></div>
+            <div class="size-name">A4</div>
+            <div class="size-dim">210 × 297 mm</div>
+          </div>
+          <div class="size-card" data-size="6X9IN" onclick="selectSize(this)">
+            <div class="size-icon" style="width:21px;height:30px"></div>
+            <div class="size-name">6×9 in</div>
+            <div class="size-dim">152 × 229 mm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Theme -->
+    <div id="step-3" style="display:none">
+      <div class="field">
+        <label>Επίλεξε ύφος</label>
+        <div class="theme-grid">
+
+          <!-- Sepia -->
+          <div class="theme-card selected" data-theme="sepia" onclick="selectTheme(this)">
+            <div class="theme-preview" style="background:#241b14">
+              <div class="cover-frame" style="border:1px solid #a9824f;opacity:.6"></div>
+              <div class="cover-lines">
+                <div class="cover-title-bar" style="background:#e8d9b8"></div>
+                <div class="cover-sub-bar" style="background:#e8d9b8"></div>
+                <div class="cover-author-bar" style="background:#a9824f"></div>
+              </div>
+            </div>
+            <div class="theme-label">Sepia<span>Vintage, serif, ζεστό ύφος</span></div>
+          </div>
+
+          <!-- Clean -->
+          <div class="theme-card" data-theme="clean" onclick="selectTheme(this)">
+            <div class="theme-preview" style="background:#111">
+              <div class="cover-frame" style="border:1px solid #9c9c9c;opacity:.5"></div>
+              <div class="cover-lines">
+                <div class="cover-title-bar" style="background:#ffffff"></div>
+                <div class="cover-sub-bar" style="background:#ffffff"></div>
+                <div class="cover-author-bar" style="background:#9c9c9c"></div>
+              </div>
+            </div>
+            <div class="theme-label">Clean<span>Μοντέρνο, λιτό, sans-serif</span></div>
+          </div>
+
+          <!-- Academic -->
+          <div class="theme-card" data-theme="academic" onclick="selectTheme(this)">
+            <div class="theme-preview" style="background:#1c2430">
+              <div class="cover-frame" style="border:1px solid #9a8156;opacity:.6"></div>
+              <div class="cover-lines">
+                <div class="cover-title-bar" style="background:#f0ede4"></div>
+                <div class="cover-sub-bar" style="background:#f0ede4"></div>
+                <div class="cover-author-bar" style="background:#9a8156"></div>
+              </div>
+            </div>
+            <div class="theme-label">Academic<span>Σοβαρό, ακαδημαϊκό ύφος</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: First chapter -->
+    <div id="step-4" style="display:none">
+      <div class="field">
+        <label>Τίτλος πρώτου κεφαλαίου / μέρους</label>
+        <input id="f-part-title" type="text" placeholder="π.χ. Εισαγωγή">
+      </div>
+      <div class="field">
+        <label>Μερικές πρώτες γραμμές <span style="font-weight:400;color:#bbb">(προαιρετικό — μπορείς να γράψεις μετά)</span></label>
+        <textarea id="f-part-body" placeholder="Γράψε εδώ τις πρώτες σου λέξεις…"></textarea>
+        <div class="part-filename-hint">Θα αποθηκευτεί ως <code>parts/01-<span id="part-fname-preview">κεφαλαιο.md</span></code></div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">📖</div>
+      <h2 id="success-title">Το βιβλίο σου είναι έτοιμο!</h2>
+      <p id="success-desc">Ανοίγει ο επεξεργαστής…</p>
+      <button class="btn-big" id="open-editor-btn" onclick="openEditor()">Άνοιγμα επεξεργαστή →</button>
+    </div>
+
+  </div><!-- /wiz-body -->
+
+  <!-- Footer -->
+  <div class="wiz-footer" id="wiz-footer">
+    <button class="btn btn-ghost" id="back-btn" onclick="back()" style="visibility:hidden">← Πίσω</button>
+    <div class="dot-nav">
+      <div class="dot active" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+    </div>
+    <button class="btn btn-primary" id="next-btn" onclick="next()">Επόμενο →</button>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+const STEPS = [
+  { label: "Βήμα 1 από 4", title: "Ποιο βιβλίο γράφεις;", progress: 25 },
+  { label: "Βήμα 2 από 4", title: "Γλώσσα & σελίδα",      progress: 50 },
+  { label: "Βήμα 3 από 4", title: "Ύφος βιβλίου",          progress: 75 },
+  { label: "Βήμα 4 από 4", title: "Πρώτο κεφάλαιο",        progress: 100 },
+];
+let currentStep = 0;
+let lang = "el", theme = "sepia", pageSize = "A5";
+
+function showStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`step-${i}`).style.display = (i === n + 1) ? '' : 'none';
+  }
+  document.getElementById('step-label').textContent = STEPS[n].label;
+  document.getElementById('step-title').textContent  = STEPS[n].title;
+  document.getElementById('progress').style.width = STEPS[n].progress + '%';
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === n));
+  document.getElementById('back-btn').style.visibility = n > 0 ? 'visible' : 'hidden';
+  document.getElementById('next-btn').textContent = n === 3 ? 'Δημιουργία βιβλίου ✓' : 'Επόμενο →';
+}
+
+function next() {
+  if (currentStep === 0) {
+    const title = document.getElementById('f-title').value.trim();
+    const author = document.getElementById('f-author').value.trim();
+    if (!title || !author) {
+      document.getElementById('f-title').style.borderColor = title ? '' : '#b94040';
+      document.getElementById('f-author').style.borderColor = author ? '' : '#b94040';
+      return;
+    }
+    document.getElementById('f-title').style.borderColor = '';
+    document.getElementById('f-author').style.borderColor = '';
+  }
+  if (currentStep === 3) { submit(); return; }
+  currentStep++;
+  showStep(currentStep);
+  if (currentStep === 3) {
+    const title = document.getElementById('f-title').value.trim();
+    const lang_ = lang === 'el' ? 'ελ' : 'en';
+    document.getElementById('f-part-title').placeholder =
+      lang === 'el' ? 'π.χ. Εισαγωγή' : 'e.g. Introduction';
+    document.getElementById('f-part-body').placeholder =
+      lang === 'el' ? 'Γράψε εδώ τις πρώτες σου λέξεις…' : 'Write your opening lines here…';
+    updatePartFname();
+  }
+}
+
+function back() {
+  if (currentStep > 0) { currentStep--; showStep(currentStep); }
+}
+
+function selectLang(el) {
+  document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  lang = el.dataset.lang;
+}
+
+function selectTheme(el) {
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  theme = el.dataset.theme;
+}
+
+function selectSize(el) {
+  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  pageSize = el.dataset.size;
+}
+
+function updatePartFname() {
+  const t = document.getElementById('f-part-title').value.trim() || 'κεφαλαιο';
+  const safe = t.replace(/\s+/g, '_').replace(/[^\w\-]/g, '').toLowerCase().slice(0, 30) || 'κεφαλαιο';
+  document.getElementById('part-fname-preview').textContent = safe + '.md';
+}
+document.getElementById('f-part-title').addEventListener('input', updatePartFname);
+
+async function submit() {
+  const title    = document.getElementById('f-title').value.trim();
+  const author   = document.getElementById('f-author').value.trim();
+  const subtitle = document.getElementById('f-subtitle').value.trim();
+  const partTitle = document.getElementById('f-part-title').value.trim() || (lang === 'el' ? 'Κεφάλαιο Α' : 'Chapter One');
+  const partBody  = document.getElementById('f-part-body').value.trim();
+  const safe = partTitle.replace(/\s+/g,'_').replace(/[^\w\-]/g,'').toLowerCase().slice(0,30) || 'κεφαλαιο';
+  const fname = `01-${safe}.md`;
+  const text = `# ${partTitle}\n\n${partBody || (lang === 'el' ? 'Γράψε εδώ…' : 'Start writing…')}\n`;
+
+  const payload = {
+    title, author, subtitle, language: lang, theme,
+    page_size: pageSize, parts_dir: 'parts', output: 'book.pdf',
+    parts: [{ filename: fname, text }]
+  };
+
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('next-btn').textContent = 'Δημιουργία…';
+
+  try {
+    const res = await fetch('/api/save', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showSuccess(title);
+    } else {
+      alert('Σφάλμα: ' + data.error);
+      document.getElementById('next-btn').disabled = false;
+      document.getElementById('next-btn').textContent = 'Δημιουργία βιβλίου ✓';
+    }
+  } catch(e) {
+    alert('Σφάλμα δικτύου.');
+    document.getElementById('next-btn').disabled = false;
+  }
+}
+
+function showSuccess(title) {
+  for (let i = 1; i <= 4; i++) document.getElementById(`step-${i}`).style.display = 'none';
+  document.getElementById('success-title').textContent = `«${title}» — έτοιμο!`;
+  document.getElementById('success-desc').textContent = 'Το πρώτο σου κεφάλαιο σε περιμένει. Μπορείς να γράψεις, να κάνεις Build και να δεις το PDF σε δευτερόλεπτα.';
+  document.getElementById('success-screen').classList.add('show');
+  document.getElementById('wiz-footer').style.display = 'none';
+  document.querySelector('.wiz-header').style.display = 'none';
+  document.getElementById('progress').style.width = '100%';
+}
+
+function openEditor() {
+  window.location.href = '/';
+}
+
+// Enter key advances
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') next();
+});
+
+showStep(0);
+</script>
+</body>
+</html>

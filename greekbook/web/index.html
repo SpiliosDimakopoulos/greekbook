@@ -1,0 +1,1920 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>greekbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════════ */
+:root {
+  --ink:        #1a1f2e;
+  --paper:      #f0ede8;
+  --accent:     #8b4513;
+  --accent-h:   #7a3b10;
+  --accent-lt:  #f5e8df;
+  --line:       #e2ddd6;
+  --muted:      #9a948e;
+  --success:    #2e7d4f;
+  --error:      #c0392b;
+  --panel:      #fdfcfa;
+  --panel-alt:  #f5f2ee;
+  --radius:     10px;
+  --shadow-sm:  0 1px 4px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.03);
+  --shadow-md:  0 8px 24px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+  --sidebar-w:  64px;
+  --hdr-h:      52px;
+  /* fonts */
+  --font-ui:    'Inter', -apple-system, "Segoe UI", sans-serif;
+  --font-serif: 'Lora', Georgia, serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, monospace;
+  /* inputs */
+  --inp-bg:     #f8f5f1;
+  --inp-focus:  #fff;
+  --inp-ph:     #c8c2ba;
+  /* textarea */
+  --ta-bg:      #fff;
+  /* code */
+  --code-bg:    #f3ede5;
+}
+[data-theme="dark"] {
+  --ink:        #e6e1db;
+  --paper:      #161412;
+  --accent:     #cc7a45;
+  --accent-h:   #db8f55;
+  --accent-lt:  #2a1a0d;
+  --line:       #2e2b27;
+  --muted:      #7c7770;
+  --panel:      #201e1b;
+  --panel-alt:  #1b1917;
+  --shadow-sm:  0 1px 4px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.2);
+  --shadow-md:  0 8px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3);
+  --inp-bg:     #1b1917;
+  --inp-focus:  #232120;
+  --inp-ph:     #48443e;
+  --ta-bg:      #1b1917;
+  --code-bg:    #242220;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESET + BASE
+═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { transition: background .2s; }
+body {
+  font-family: var(--font-ui);
+  background: var(--paper); color: var(--ink);
+  font-size: 14px; line-height: 1.5;
+  display: flex; height: 100vh; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR NAV (icon rail, left edge)
+═══════════════════════════════════════════════════════════ */
+#sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  display: flex; flex-direction: column;
+  background: var(--panel); border-right: 1px solid var(--line);
+  z-index: 20;
+}
+.sidebar-brand {
+  height: var(--hdr-h); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+}
+.sidebar-brand-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--accent); display: flex; align-items: center;
+  justify-content: center; font-size: 1.05rem; line-height: 1;
+  cursor: default; user-select: none;
+  box-shadow: 0 3px 10px rgba(139,69,19,.35), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.sidebar-nav {
+  flex: 1; display: flex; flex-direction: column;
+  padding: .5rem 0; gap: 1px;
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 4px;
+  width: 100%; padding: .6rem .3rem;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: .58rem; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  transition: color .15s, background .15s;
+  position: relative; font-family: var(--font-ui);
+}
+.nav-btn svg { width: 19px; height: 19px; flex-shrink: 0; }
+.nav-btn span { line-height: 1; }
+.nav-btn:hover { color: var(--ink); background: var(--panel-alt); }
+.nav-btn.active { color: var(--accent); background: var(--accent-lt); }
+.nav-btn.active::before {
+  content: ''; position: absolute; left: 0; top: 25%; bottom: 25%;
+  width: 3px; background: var(--accent); border-radius: 0 3px 3px 0;
+}
+.sidebar-bottom {
+  display: flex; flex-direction: column; align-items: center;
+  padding: .5rem 0 .7rem; gap: 4px;
+  border-top: 1px solid var(--line);
+}
+#theme-toggle {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); display: flex; align-items: center;
+  justify-content: center; transition: color .15s, background .15s;
+}
+#theme-toggle:hover { color: var(--accent); background: var(--accent-lt); }
+#theme-toggle svg { width: 16px; height: 16px; }
+#theme-toggle .icon-sun  { display: none; }
+#theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] #theme-toggle .icon-sun  { display: block; }
+[data-theme="dark"] #theme-toggle .icon-moon { display: none; }
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN AREA  (header + content)
+═══════════════════════════════════════════════════════════ */
+#main-wrap {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; position: relative;
+}
+
+/* ── Top header bar ────────────────────────────────────── */
+#topbar {
+  height: var(--hdr-h); flex-shrink: 0;
+  display: flex; align-items: center; gap: .7rem;
+  padding: 0 1rem 0 1.1rem;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+}
+#topbar-context {
+  font-size: .84rem; font-weight: 600; color: var(--ink);
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: var(--font-ui);
+  letter-spacing: -.01em;
+}
+#topbar-context .ctx-book {
+  color: var(--muted); font-weight: 400; font-size: .78rem;
+}
+.hdr-actions { display: flex; gap: .4rem; align-items: center; }
+.hdr-sep { width: 1px; height: 18px; background: var(--line); margin: 0 .1rem; flex-shrink: 0; }
+#pdf-download-topbar { display: none; }
+#pdf-download-topbar.visible { display: inline-flex !important; }
+
+/* ── Live status ───────────────────────────────────────── */
+#build-progress {
+  position: absolute; top: var(--hdr-h); left: 0; right: 0;
+  height: 2px; z-index: 30; overflow: hidden;
+  pointer-events: none; opacity: 0; transition: opacity .2s;
+}
+#build-progress.active { opacity: 1; }
+#build-progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), #e8a060);
+  transition: width .35s ease, background .3s;
+  border-radius: 0 2px 2px 0;
+}
+#build-progress.done #build-progress-bar  { background: var(--success); }
+#build-progress.error #build-progress-bar { background: var(--error); }
+@keyframes progress-indeterminate {
+  0%   { transform: translateX(-100%); width: 60%; }
+  100% { transform: translateX(200%);  width: 60%; }
+}
+#build-progress.indeterminate #build-progress-bar {
+  width: 60%; animation: progress-indeterminate 1.3s ease-in-out infinite;
+}
+.btn-spinner {
+  display: inline-block; width: 11px; height: 11px;
+  border: 1.8px solid rgba(255,255,255,.35);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .65s linear infinite;
+  margin-right: 5px; vertical-align: middle; flex-shrink: 0;
+}
+.btn.secondary .btn-spinner { border-color: rgba(139,69,19,.25); border-top-color: var(--accent); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes save-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(139,69,19,0); }
+  50%      { box-shadow: 0 0 0 3px rgba(139,69,19,.18); }
+}
+.autosaving { animation: save-pulse 1.4s ease-in-out infinite; }
+/* ── Buttons ───────────────────────────────────────────── */
+.btn {
+  background: var(--accent); color: #fff; border: none;
+  padding: .42rem 1rem; border-radius: 7px; cursor: pointer;
+  font-size: .8rem; font-weight: 600; white-space: nowrap;
+  transition: background .15s, opacity .15s, box-shadow .15s; line-height: 1.2;
+  font-family: var(--font-ui); letter-spacing: .01em;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.btn:hover:not(:disabled) { background: var(--accent-h); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.secondary {
+  background: transparent; color: var(--accent);
+  border: 1.5px solid currentColor;
+}
+.btn.secondary:hover:not(:disabled) { background: var(--accent-lt); }
+.btn.ghost {
+  background: transparent; color: var(--muted);
+  border: 1.5px solid var(--line);
+}
+.btn.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+.btn.icon-btn {
+  padding: .38rem .55rem; background: var(--panel-alt);
+  border: 1.5px solid var(--line); color: var(--muted);
+  display: flex; align-items: center; gap: .3rem;
+}
+.btn.icon-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+.btn.icon-btn svg { width: 13px; height: 13px; }
+
+/* ═══════════════════════════════════════════════════════════
+   CONTENT SPLIT  (left editor | resizer | right PDF)
+═══════════════════════════════════════════════════════════ */
+#content-split {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* ── Left panel ─────────────────────────────────────────── */
+#left {
+  width: 42%; min-width: 300px; display: flex;
+  flex-direction: column; overflow: hidden; flex-shrink: 0;
+  background: var(--paper);
+}
+
+/* ── Tab panels ─────────────────────────────────────────── */
+.tab-panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.tab-panel.active { display: flex; }
+
+/* ── Resizer ─────────────────────────────────────────────── */
+#resizer {
+  width: 5px; flex-shrink: 0; cursor: col-resize;
+  background: var(--line); position: relative;
+  transition: background .2s, width .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+#resizer::before {
+  content: ''; position: absolute;
+  top: 0; bottom: 0; left: -5px; right: -5px;
+}
+/* Grip dots */
+#resizer::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px; height: 24px;
+  background: radial-gradient(circle, var(--muted) 1.2px, transparent 1.2px);
+  background-size: 3px 6px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+#resizer:hover, #resizer.dragging {
+  background: var(--accent); width: 5px;
+}
+#resizer:hover::after, #resizer.dragging::after { opacity: .6; }
+
+/* ── Right panel (PDF) ────────────────────────────────────── */
+#right {
+  flex: 1; background: #4a4845; display: flex;
+  flex-direction: column; overflow: hidden; min-width: 220px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EDITOR TAB
+═══════════════════════════════════════════════════════════ */
+
+/* ── Book settings (collapsible top strip) ─────────────── */
+#book-settings {
+  flex-shrink: 0; background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+#book-settings-toggle {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .6rem 1rem; cursor: pointer;
+  user-select: none; width: 100%;
+  background: none; border: none; color: var(--ink);
+  font-family: inherit; transition: background .12s;
+}
+#book-settings-toggle:hover { background: var(--panel-alt); }
+#settings-label {
+  font-size: .67rem; font-weight: 700; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--muted); text-align: left;
+  flex-shrink: 0; font-family: var(--font-ui);
+}
+#settings-preview {
+  font-size: .8rem; color: var(--ink); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1;
+}
+#settings-caret {
+  color: var(--muted); flex-shrink: 0; transition: transform .25s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center;
+}
+#settings-caret svg { width: 14px; height: 14px; display: block; }
+#book-settings.open #settings-caret { transform: rotate(180deg); }
+#book-settings-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .28s cubic-bezier(.4,0,.2,1), padding .2s;
+  padding: 0 1rem;
+}
+#book-settings.open #book-settings-body {
+  max-height: 400px;
+  padding: .7rem 1rem 1rem;
+}
+
+.fields-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem .65rem;
+}
+.fields-grid .full { grid-column: 1 / -1; }
+.field-group { display: flex; flex-direction: column; gap: .18rem; }
+.field-lbl {
+  font-size: .67rem; font-weight: 700; color: var(--muted);
+  letter-spacing: .06em; text-transform: uppercase;
+  font-family: var(--font-ui);
+}
+.field-lbl-sub { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: .8; }
+input, select {
+  width: 100%; padding: .38rem .6rem;
+  border: 1.5px solid var(--line); border-radius: 7px;
+  font-size: .83rem; background: var(--inp-bg);
+  color: var(--ink); transition: border-color .15s, background .15s, box-shadow .15s;
+  font-family: var(--font-ui); -webkit-appearance: none; appearance: none;
+}
+input:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  background: var(--inp-focus);
+  box-shadow: 0 0 0 3px rgba(139,69,19,.1);
+}
+input::placeholder { color: var(--inp-ph); }
+
+/* ── Chapters list ─────────────────────────────────────── */
+#chapters-wrap {
+  flex: 1; overflow-y: auto;
+  padding: .8rem .85rem 5rem;
+  display: flex; flex-direction: column; gap: .45rem;
+  /* Subtle inner scroll fade at bottom */
+  mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+}
+
+/* ── Chapter card ──────────────────────────────────────── */
+.chapter {
+  background: var(--panel);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: border-color .18s, box-shadow .18s, transform .15s;
+}
+.chapter:focus-within {
+  border-color: rgba(139,69,19,.3);
+  box-shadow: 0 0 0 3px rgba(139,69,19,.07), var(--shadow-sm);
+}
+.chapter:hover:not(:focus-within) {
+  border-color: rgba(139,69,19,.2);
+}
+
+.chapter-head {
+  display: flex; align-items: center; gap: .45rem;
+  padding: .48rem .65rem;
+  background: var(--panel-alt);
+  cursor: pointer; user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: background .12s;
+}
+.chapter:not(.collapsed) .chapter-head { border-bottom-color: var(--line); }
+.chapter-head:hover { background: var(--panel); }
+
+.chapter-num {
+  font-size: .58rem; font-weight: 700; letter-spacing: .08em;
+  color: var(--accent); background: var(--accent-lt);
+  border-radius: 5px; padding: .18rem .4rem;
+  flex-shrink: 0; min-width: 2.2rem; text-align: center;
+  text-transform: uppercase; font-family: var(--font-ui);
+  border: 1px solid rgba(139,69,19,.15);
+  line-height: 1.4;
+}
+
+.chapter-info { flex: 1; min-width: 0; }
+.chapter-title {
+  font-size: .875rem; font-weight: 500; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.35;
+  font-family: var(--font-serif);
+}
+.chapter-meta {
+  font-size: .69rem; color: var(--muted); margin-top: .06rem;
+  font-family: var(--font-ui); font-weight: 400;
+  letter-spacing: .01em;
+}
+
+.chapter-actions {
+  display: flex; align-items: center; gap: .15rem; flex-shrink: 0;
+}
+.chapter-collapse-icon {
+  color: var(--muted); flex-shrink: 0; transition: transform .2s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center; padding: .2rem;
+}
+.chapter-collapse-icon svg { width: 13px; height: 13px; display: block; }
+.chapter:not(.collapsed) .chapter-collapse-icon { transform: rotate(180deg); }
+
+/* Delete appears only on header hover */
+.chapter-del {
+  width: 26px; height: 26px;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color .12s, background .12s, opacity .15s;
+  flex-shrink: 0;
+  opacity: 0;
+}
+.chapter-head:hover .chapter-del { opacity: 1; }
+.chapter-del:hover { color: var(--error); background: rgba(185,64,64,.1); }
+.chapter-del svg { width: 13px; height: 13px; }
+
+/* Collapse body: animated */
+.chapter-body {
+  overflow: hidden;
+  max-height: 2000px;
+  transition: max-height .25s cubic-bezier(.4,0,.2,1);
+}
+.chapter.collapsed .chapter-body { max-height: 0; }
+
+.chapter-body textarea {
+  display: block; width: 100%;
+  min-height: 120px;
+  font-family: var(--font-mono);
+  font-size: .84rem; line-height: 1.7;
+  padding: .85rem 1rem;
+  background: var(--ta-bg); color: var(--ink);
+  border: none; outline: none; resize: none;
+  transition: background .2s;
+  field-sizing: content; /* auto-grow where supported */
+}
+
+/* ── Add chapter bar ───────────────────────────────────── */
+#add-chapter-bar {
+  flex-shrink: 0; padding: .55rem .85rem;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+#add-chapter-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: .4rem; width: 100%; padding: .52rem .75rem;
+  background: var(--panel); border: 1.5px dashed var(--line);
+  border-radius: var(--radius); cursor: pointer;
+  color: var(--accent); font-size: .8rem; font-weight: 600;
+  transition: border-color .15s, background .15s, color .15s;
+  font-family: var(--font-ui); letter-spacing: .01em;
+}
+#add-chapter-btn:hover {
+  border-color: var(--accent); background: var(--accent-lt);
+}
+#add-chapter-btn svg { width: 13px; height: 13px; }
+
+/* ═══════════════════════════════════════════════════════════
+   COVER TAB
+═══════════════════════════════════════════════════════════ */
+.tab-scroll { flex: 1; overflow-y: auto; padding: 1rem 1.1rem; }
+.tab-hint { font-size: .8rem; color: var(--muted); margin-bottom: .9rem; line-height: 1.6; }
+
+#cover-drop {
+  border: 2px dashed var(--line); border-radius: var(--radius);
+  min-height: 320px; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; position: relative;
+  overflow: hidden; background: var(--panel-alt);
+  transition: border-color .2s, background .2s; margin-bottom: .75rem;
+}
+#cover-drop:hover:not(.has-image) { border-color: var(--accent); background: var(--accent-lt); }
+#cover-drop.drag-over { border-color: var(--accent); background: var(--accent-lt); }
+#cover-drop.has-image { border-style: solid; border-color: var(--line); }
+
+#cover-placeholder {
+  display: flex; flex-direction: column; align-items: center;
+  gap: .4rem; padding: 2rem 1rem; color: var(--muted); text-align: center;
+}
+.cover-ph-icon {
+  width: 48px; height: 64px; position: relative; margin-bottom: .3rem;
+}
+.cover-ph-icon-bg {
+  position: absolute; inset: 0; border-radius: 3px 6px 6px 3px;
+  background: var(--panel); border: 1.5px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+.cover-ph-icon-spine {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+  border-radius: 3px 0 0 3px; background: var(--accent); opacity: .3;
+}
+#cover-placeholder strong { font-size: .88rem; color: var(--ink); }
+#cover-placeholder small  { font-size: .75rem; }
+#cover-preview {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; display: none; border-radius: var(--radius);
+}
+.cover-badge {
+  position: absolute; top: .55rem; right: .55rem;
+  background: var(--success); color: #fff;
+  font-size: .72rem; padding: .2rem .5rem; border-radius: 4px; font-weight: 700;
+}
+.cover-actions { display: flex; gap: .5rem; }
+#cover-input { display: none; }
+
+/* ═══════════════════════════════════════════════════════════
+   STRUCTURE TAB
+═══════════════════════════════════════════════════════════ */
+.struct-controls {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .75rem 1.1rem;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.struct-controls label {
+  font-size: .78rem; color: var(--muted); white-space: nowrap;
+}
+.struct-count-input {
+  width: 54px; padding: .3rem .4rem; font-size: .88rem;
+  font-weight: 700; text-align: center;
+  border: 1.5px solid var(--line); border-radius: 6px;
+  background: var(--inp-focus); color: var(--ink); font-family: inherit;
+}
+.struct-count-input:focus { outline: none; border-color: var(--accent); }
+.format-link {
+  margin-left: auto; font-size: .77rem; color: var(--accent);
+  background: none; border: none; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px; font-family: inherit;
+}
+.struct-list { flex: 1; overflow-y: auto; padding: .75rem 1.1rem; }
+.struct-chapter {
+  border: 1.5px solid var(--line); border-radius: var(--radius);
+  margin-bottom: .55rem; overflow: hidden; background: var(--panel);
+}
+.struct-chapter-head {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .4rem .7rem; background: var(--panel-alt);
+  border-bottom: 1px solid var(--line);
+}
+.struct-num {
+  font-size: .7rem; font-weight: 800; color: var(--accent);
+  background: var(--accent-lt); border-radius: 4px;
+  padding: .14rem .35rem; min-width: 2rem; text-align: center;
+  text-transform: uppercase;
+}
+.struct-chapter-title {
+  flex: 1; border: none; background: transparent;
+  font-size: .84rem; font-weight: 600; color: var(--ink);
+  outline: none; padding: .1rem 0; font-family: inherit;
+}
+.struct-chapter-title::placeholder { color: var(--muted); font-weight: 400; }
+.struct-chapter-body { padding: .5rem .7rem; background: var(--panel); }
+.mode-toggle {
+  display: flex; border: 1.5px solid var(--line);
+  border-radius: 6px; overflow: hidden; margin-bottom: .5rem;
+}
+.mode-btn {
+  flex: 1; padding: .28rem .5rem; background: none; border: none;
+  font-size: .75rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: background .15s, color .15s; font-family: inherit;
+}
+.mode-btn.active { background: var(--accent); color: #fff; }
+.mode-btn:not(.active):hover { background: var(--accent-lt); color: var(--accent); }
+.chap-upload-zone {
+  border: 1.5px dashed var(--line); border-radius: 6px;
+  padding: .6rem; text-align: center; cursor: pointer;
+  font-size: .8rem; color: var(--muted);
+  transition: border-color .15s, background .15s;
+}
+.chap-upload-zone:hover { border-color: var(--accent); background: var(--accent-lt); color: var(--accent); }
+.chap-upload-zone.has-file { border-color: var(--success); background: rgba(46,125,79,.06); color: var(--success); }
+.chap-upload-zone.converting { border-color: #f5a623; background: rgba(245,166,35,.06); color: #b07000; }
+.chap-textarea {
+  width: 100%; min-height: 90px; max-height: 600px;
+  font-family: ui-monospace, monospace; font-size: .84rem;
+  border: 1.5px solid var(--line); border-radius: 6px;
+  padding: .45rem .6rem; resize: vertical; outline: none;
+  background: var(--inp-bg); color: var(--ink); line-height: 1.55;
+  transition: border-color .15s; font-family: inherit;
+}
+.chap-textarea:focus { border-color: var(--accent); }
+#struct-apply-btn {
+  display: block; width: calc(100% - 2.2rem); margin: .75rem 1.1rem 1.1rem;
+  padding: .55rem; background: var(--accent); color: #fff; border: none;
+  border-radius: var(--radius); font-size: .84rem; font-weight: 700;
+  cursor: pointer; transition: background .15s; font-family: inherit;
+}
+#struct-apply-btn:hover { background: var(--accent-h); }
+
+/* ═══════════════════════════════════════════════════════════
+   EXAMPLES TAB
+═══════════════════════════════════════════════════════════ */
+.examples-save-bar {
+  display: flex; gap: .5rem; padding: .75rem 1.1rem;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.examples-save-bar input { flex: 1; }
+.examples-list-wrap { flex: 1; overflow-y: auto; padding: .75rem 1.1rem; }
+.examples-empty { color: var(--muted); text-align: center; padding: 2.5rem; font-size: .83rem; }
+.example-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem .8rem; border: 1.5px solid var(--line);
+  border-radius: var(--radius); margin-bottom: .5rem;
+  background: var(--panel); cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.example-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(124,74,45,.1); }
+.ex-title  { font-weight: 600; font-size: .85rem; color: var(--ink); font-family: var(--font-serif); }
+.ex-author { font-size: .78rem; color: var(--muted); margin-top: .06rem; font-family: var(--font-ui); }
+.ex-name   { font-size: .71rem; color: var(--muted); font-family: var(--font-mono); }
+.example-load-btn {
+  flex-shrink: 0; font-size: .76rem; padding: .28rem .6rem;
+  border: 1.5px solid var(--line); border-radius: 5px;
+  background: none; cursor: pointer; color: var(--muted);
+  transition: all .15s; font-weight: 600; font-family: inherit;
+  white-space: nowrap;
+}
+.example-load-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+
+/* ═══════════════════════════════════════════════════════════
+   PDF VIEWER (right panel)
+═══════════════════════════════════════════════════════════ */
+#pdf-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.2rem;
+  background: #3e3c3a; z-index: 2;
+}
+.pdf-ph-book {
+  width: 64px; height: 82px; position: relative;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,.4));
+}
+.pdf-ph-shadow {
+  position: absolute; inset: 0; border-radius: 3px 7px 7px 3px;
+  background: rgba(0,0,0,.35); transform: translate(4px,4px);
+  filter: blur(2px);
+}
+.pdf-ph-cover {
+  position: absolute; inset: 0; border-radius: 3px 7px 7px 3px;
+  background: linear-gradient(135deg, #6b6460 0%, #4e4b48 100%);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.pdf-ph-spine {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 7px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(to right, var(--accent), rgba(196,122,78,.6));
+}
+.pdf-ph-lines { padding: 14px 10px 10px 18px; display: flex; flex-direction: column; gap: 6px; }
+.pdf-ph-line  { height: 2px; border-radius: 1px; background: rgba(255,255,255,.2); }
+.pdf-ph-line:first-child { background: rgba(255,255,255,.4); height: 3px; }
+
+#pdf-placeholder .ph-text { text-align: center; }
+#pdf-placeholder .ph-text strong {
+  display: block; color: rgba(255,255,255,.75);
+  font-size: .9rem; font-weight: 600; margin-bottom: .3rem;
+}
+#pdf-placeholder .ph-text p {
+  font-size: .76rem; color: rgba(255,255,255,.4); line-height: 1.6;
+}
+#pdf-placeholder .ph-cta {
+  display: flex; align-items: center; gap: .35rem;
+  padding: .45rem 1rem; border-radius: 7px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.6); font-size: .76rem; font-weight: 600;
+  cursor: pointer; transition: background .15s, border-color .15s;
+  font-family: inherit;
+}
+#pdf-placeholder .ph-cta:hover {
+  background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.3);
+  color: rgba(255,255,255,.85);
+}
+#pdf-placeholder .ph-cta svg { width: 13px; height: 13px; }
+
+#pdf-toolbar {
+  display: none; flex-shrink: 0;
+  align-items: center; gap: .25rem;
+  padding: 0;
+  background: #262422; border-bottom: 1px solid #161514;
+}
+#pdf-toolbar.visible { display: flex; }
+#pdf-toolbar button {
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
+  color: #c8c4c0; border-radius: 5px; padding: .22rem .48rem;
+  cursor: pointer; font-size: .75rem; font-weight: 600; line-height: 1;
+  transition: background .12s, color .12s; font-family: inherit;
+}
+#pdf-toolbar button:hover:not(:disabled) { background: rgba(255,255,255,.18); color: #fff; }
+#pdf-toolbar button:disabled { opacity: .25; cursor: default; }
+#pdf-page-info   { color: #888; font-size: .73rem; min-width: 60px; text-align: center; }
+#pdf-zoom-label  { color: #888; font-size: .73rem; min-width: 34px; text-align: center; }
+.tb-sep { width: 1px; height: 14px; background: rgba(255,255,255,.12); margin: 0 .1rem; flex-shrink: 0; }
+#pdf-toolbar .spacer { flex: 1; }
+
+#pdf-canvas-wrap {
+  flex: 1; overflow: auto; display: flex;
+  flex-direction: column; align-items: center;
+  padding: 14px 0; gap: 10px; background: #4a4845;
+}
+#pdf-canvas-wrap canvas {
+  display: block; box-shadow: 0 6px 30px rgba(0,0,0,.5);
+  border-radius: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════ */
+#toast {
+  position: fixed; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--ink); color: var(--paper);
+  border-radius: 10px; padding: .55rem 1.1rem;
+  font-size: .78rem; font-weight: 600;
+  pointer-events: none; opacity: 0;
+  transition: opacity .18s, transform .22s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18), 0 1px 4px rgba(0,0,0,.12);
+  display: flex; align-items: center; gap: .4rem;
+  letter-spacing: .01em;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.ok   { background: var(--success); color: #fff; }
+#toast.err  { background: var(--error);   color: #fff; }
+
+.confirm-pop {
+  position: absolute; z-index: 200;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.15), 0 2px 8px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
+  padding: .65rem .8rem .65rem 1rem;
+  display: flex; align-items: center; gap: .65rem;
+  white-space: nowrap; animation: pop-in .15s cubic-bezier(.34,1.56,.64,1);
+  backdrop-filter: blur(4px);
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(.9) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.confirm-pop-msg {
+  font-size: .82rem; color: var(--ink); font-weight: 500;
+  font-family: var(--font-ui);
+}
+.confirm-pop-yes {
+  background: var(--error); color: #fff; border: none;
+  border-radius: 6px; cursor: pointer;
+  font-size: .78rem; font-weight: 600;
+  padding: .32rem .72rem; font-family: var(--font-ui);
+  letter-spacing: .01em;
+  box-shadow: 0 1px 3px rgba(192,57,43,.3), inset 0 1px 0 rgba(255,255,255,.1);
+  transition: background .12s, box-shadow .12s;
+}
+.confirm-pop-yes:hover {
+  background: #a93226;
+  box-shadow: 0 2px 6px rgba(192,57,43,.35);
+}
+.confirm-pop-no {
+  background: var(--panel-alt); color: var(--muted);
+  border: 1.5px solid var(--line); border-radius: 6px; cursor: pointer;
+  font-size: .78rem; font-weight: 500;
+  padding: .3rem .65rem; font-family: var(--font-ui);
+  transition: border-color .12s, color .12s, background .12s;
+}
+.confirm-pop-no:hover { border-color: var(--ink); color: var(--ink); background: var(--panel); }
+
+/* ═══════════════════════════════════════════════════════════
+   FORMAT MODAL
+═══════════════════════════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 300; display: none; align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--panel); border-radius: 14px;
+  max-width: 500px; width: 92%; max-height: 82vh; overflow-y: auto;
+  box-shadow: 0 16px 56px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.10); padding: 1.5rem 1.7rem;
+}
+.modal h2 { font-size: .98rem; margin-bottom: .9rem; color: var(--ink); font-family: var(--font-serif); font-weight: 600; }
+.modal h3 { font-size: .72rem; font-weight: 700; color: var(--accent); margin: .9rem 0 .25rem; text-transform: uppercase; letter-spacing: .07em; font-family: var(--font-ui); }
+.modal p  { font-size: .82rem; color: var(--muted); margin: .2rem 0; font-family: var(--font-ui); }
+.modal pre {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 7px;
+  padding: .65rem .8rem; font-size: .79rem; line-height: 1.65;
+  overflow-x: auto; font-family: var(--font-mono); white-space: pre;
+  margin: .3rem 0 .6rem;
+}
+.modal-close {
+  float: right; background: none; border: none; font-size: 1.1rem;
+  cursor: pointer; color: var(--muted); padding: 0; line-height: 1;
+}
+.modal-close:hover { color: var(--ink); }
+.format-hint-link {
+  font-size: .76rem; color: var(--accent); cursor: pointer;
+  text-decoration: underline; background: none; border: none;
+  font-family: inherit; text-underline-offset: 2px;
+}
+
+/* ── Upload spinner ────────────────────────────────────── */
+.upload-spinner {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid var(--line); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Empty-state splash (full panel overlay) ────────────── */
+#empty-splash {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--paper);
+  gap: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+}
+#empty-splash.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.splash-mark {
+  font-size: 2.6rem; line-height: 1;
+  margin-bottom: 1.1rem;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.12));
+}
+.splash-title {
+  font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600;
+  color: var(--ink); margin-bottom: .4rem; letter-spacing: -.01em;
+}
+.splash-sub {
+  font-family: var(--font-ui); font-size: .78rem; color: var(--muted);
+  margin-bottom: 1.8rem; line-height: 1.5; text-align: center;
+  max-width: 240px;
+}
+.splash-actions {
+  display: flex; gap: .75rem; align-items: stretch;
+}
+.splash-btn-primary {
+  display: flex; flex-direction: column; align-items: center;
+  gap: .35rem; padding: .85rem 1.4rem;
+  background: var(--accent); color: #fff; border: none;
+  border-radius: 10px; cursor: pointer;
+  font-family: var(--font-ui); font-size: .82rem; font-weight: 600;
+  line-height: 1.2; transition: background .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(139,69,19,.3), inset 0 1px 0 rgba(255,255,255,.12);
+  min-width: 130px;
+}
+.splash-btn-primary:hover { background: var(--accent-h); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(139,69,19,.35); }
+.splash-btn-primary:active { transform: translateY(0); }
+.splash-btn-primary .spl-icon { font-size: 1.3rem; }
+.splash-btn-primary .spl-label { white-space: nowrap; }
+.splash-btn-primary .spl-hint {
+  font-size: .69rem; font-weight: 400; opacity: .75; white-space: nowrap;
+}
+.splash-divider {
+  display: flex; align-items: center;
+  font-family: var(--font-ui); font-size: .72rem; color: var(--muted);
+  padding: 0 .1rem;
+}
+.splash-btn-ghost {
+  display: flex; flex-direction: column; align-items: center;
+  gap: .35rem; padding: .85rem 1.4rem;
+  background: var(--panel); color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 10px; cursor: pointer;
+  font-family: var(--font-ui); font-size: .82rem; font-weight: 600;
+  line-height: 1.2; transition: border-color .15s, background .15s, transform .1s;
+  min-width: 130px;
+}
+.splash-btn-ghost:hover { border-color: var(--accent); background: var(--accent-lt); transform: translateY(-1px); }
+.splash-btn-ghost:active { transform: translateY(0); }
+.splash-btn-ghost .spl-icon { font-size: 1.3rem; }
+.splash-btn-ghost .spl-hint { font-size: .69rem; color: var(--muted); font-weight: 400; white-space: nowrap; }
+
+/* ── "Νέο βιβλίο" clear button in topbar ───────────────── */
+#clear-btn {
+  display: none;
+  background: transparent; color: var(--muted);
+  border: 1.5px solid var(--line); border-radius: 7px;
+  padding: .38rem .75rem; cursor: pointer;
+  font-size: .78rem; font-weight: 500;
+  font-family: var(--font-ui); letter-spacing: .01em;
+  transition: border-color .15s, color .15s, background .15s;
+  white-space: nowrap;
+}
+#clear-btn:hover { border-color: var(--error); color: var(--error); background: rgba(192,57,43,.05); }
+#clear-btn.visible { display: block; }
+
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon" title="greekbook">📖</div>
+  </div>
+  <div class="sidebar-nav">
+    <button class="nav-btn active" data-panel="editor" data-label="Επεξεργαστής">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      <span>Κείμενο</span>
+    </button>
+    <button class="nav-btn" data-panel="cover" data-label="Εξώφυλλο">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 15l5-5 4 4 3-3 6 6"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+      </svg>
+      <span>Εξώφυλλο</span>
+    </button>
+    <button class="nav-btn" data-panel="structure" data-label="Δομή κεφαλαίων">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+      </svg>
+      <span>Δομή</span>
+    </button>
+
+  </div>
+  <div class="sidebar-bottom">
+    <button id="theme-toggle" title="Dark / Light mode" aria-label="Εναλλαγή θέματος">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN AREA
+═══════════════════════════════════════════════════════════ -->
+<div id="main-wrap">
+  <div id="build-progress"><div id="build-progress-bar"></div></div>
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div id="topbar-context">
+      <span id="ctx-panel-name">Επεξεργαστής</span>
+      <span class="ctx-book" id="topbar-book-name"></span>
+    </div>
+    <div class="hdr-actions">
+      <button id="clear-btn" title="Διαγραφή όλων και νέο βιβλίο">↩ Νέο βιβλίο</button>
+      <div class="hdr-sep"></div>
+      <button class="btn secondary" id="epubBtn">⬇ EPUB</button>
+      <button class="btn secondary" id="pdf-download-topbar" style="display:none" title="Κατέβασε το PDF που έφτιαξες">⬇ PDF</button>
+      <button class="btn" id="buildBtn" title="Ctrl+Enter">▶ Build PDF</button>
+    </div>
+  </div>
+
+  <!-- Content split -->
+  <div id="content-split">
+
+    <!-- LEFT: panels -->
+    <div id="left">
+
+      <!-- ── EDITOR PANEL ────────────────────────── -->
+      <div class="tab-panel active" id="panel-editor" style="position:relative;">
+
+        <!-- Empty-state splash — visible until user has chapters or starts typing -->
+        <div id="empty-splash" class="visible">
+          <div class="splash-mark">📖</div>
+          <div class="splash-title">greekbook</div>
+          <div class="splash-sub">Τυπογραφία βιβλίου στα ελληνικά — από Markdown σε PDF</div>
+          <div class="splash-actions">
+            <button class="splash-btn-primary" id="load-demo-btn">
+              <span class="spl-icon">✦</span>
+              <span class="spl-label">Δες παράδειγμα</span>
+              <span class="spl-hint">Common Sense · Thomas Paine</span>
+            </button>
+            <div class="splash-divider">ή</div>
+            <button class="splash-btn-ghost" id="start-blank-btn">
+              <span class="spl-icon">✎</span>
+              <span class="spl-label">Νέο βιβλίο</span>
+              <span class="spl-hint">Ξεκίνα από άδειο</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Book settings strip (collapsible) -->
+        <div id="book-settings" class="open">
+          <button id="book-settings-toggle">
+            <span id="settings-label">Στοιχεία βιβλίου</span>
+            <span id="settings-preview"></span>
+            <span id="settings-caret">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </button>
+          <div id="book-settings-body">
+            <div class="fields-grid">
+              <div class="field-group">
+                <span class="field-lbl">Τίτλος</span>
+                <input id="f_title" placeholder="π.χ. Ο Έρωτας της Αγγελικής">
+              </div>
+              <div class="field-group">
+                <span class="field-lbl">Συγγραφέας</span>
+                <input id="f_author" placeholder="Όνομα Συγγραφέα">
+              </div>
+              <div class="field-group">
+                <span class="field-lbl">Υπότιτλος <span class="field-lbl-sub">(προαιρετικό)</span></span>
+                <input id="f_subtitle" placeholder="—">
+              </div>
+              <div class="field-group">
+                <span class="field-lbl">Theme</span>
+                <select id="f_theme"></select>
+              </div>
+              <div class="field-group full">
+                <span class="field-lbl">Μέγεθος σελίδας <span class="field-lbl-sub">A4 · A5 · A6 · B5 · LETTER ή π.χ. 148x210mm</span></span>
+                <input id="f_page_size" placeholder="A5">
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div id="chapters-wrap"></div>
+
+        <!-- Add chapter bar -->
+        <div id="add-chapter-bar">
+          <button id="add-chapter-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Προσθήκη κεφαλαίου
+          </button>
+        </div>
+
+      </div><!-- /panel-editor -->
+
+      <!-- ── COVER PANEL ─────────────────────────── -->
+      <div class="tab-panel" id="panel-cover">
+        <div class="tab-scroll">
+          <p class="tab-hint">Ανέβασε εικόνα εξωφύλλου (JPG, PNG, WEBP). Θα καλύψει ολόκληρη την πρώτη σελίδα στο PDF.</p>
+          <div id="cover-drop">
+            <div id="cover-placeholder">
+              <div class="cover-ph-icon">
+                <div class="cover-ph-icon-bg"></div>
+                <div class="cover-ph-spine"></div>
+              </div>
+              <strong>Σύρε εικόνα ή κάνε κλικ</strong>
+              <small>JPG · PNG · WEBP — τουλάχιστον 800px πλάτος</small>
+            </div>
+            <img id="cover-preview" alt="Εξώφυλλο">
+            <span class="cover-badge" id="cover-badge" style="display:none">✓ Αποθηκεύτηκε</span>
+          </div>
+          <input type="file" id="cover-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+          <div class="cover-actions">
+            <button class="btn secondary" onclick="document.getElementById('cover-input').click()">Αλλαγή εικόνας</button>
+            <button class="btn ghost" id="cover-remove-btn">Αφαίρεση</button>
+          </div>
+        </div>
+      </div><!-- /panel-cover -->
+
+      <!-- ── STRUCTURE PANEL ──────────────────────── -->
+      <div class="tab-panel" id="panel-structure">
+        <div class="struct-controls">
+          <label for="chap-count">Κεφάλαια</label>
+          <input type="number" class="struct-count-input" id="chap-count" min="1" max="50" value="3">
+          <button class="btn secondary" id="chap-count-apply" style="padding:.28rem .7rem;font-size:.76rem">Εφαρμογή</button>
+          <button class="format-hint-link" id="format-help-btn">❓ Format helper</button>
+        </div>
+        <div class="struct-list" id="struct-chapters"></div>
+        <button id="struct-apply-btn">Εισαγωγή στον Επεξεργαστή →</button>
+      </div><!-- /panel-structure -->
+
+
+
+    </div><!-- /#left -->
+
+    <div id="resizer" title="Σύρε για αλλαγή πλάτους"></div>
+
+    <!-- RIGHT: PDF viewer -->
+    <div id="right" style="position:relative;">
+      <div id="pdf-placeholder">
+        <div class="pdf-ph-book">
+          <div class="pdf-ph-shadow"></div>
+          <div class="pdf-ph-cover">
+            <div class="pdf-ph-spine"></div>
+            <div class="pdf-ph-lines">
+              <div class="pdf-ph-line"></div>
+              <div class="pdf-ph-line" style="width:80%"></div>
+              <div class="pdf-ph-line" style="width:60%"></div>
+              <div class="pdf-ph-line" style="width:90%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ph-text">
+          <strong>Δεν υπάρχει ακόμα προεπισκόπηση</strong>
+          <p>Γράψε κείμενο στον επεξεργαστή<br>και πάτα Build PDF για να δεις το βιβλίο σου.</p>
+        </div>
+        <button class="ph-cta" onclick="document.getElementById('buildBtn').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Build PDF τώρα
+        </button>
+      </div>
+      <div id="pdf-toolbar">
+      </div>
+      <iframe id="pdf-iframe" style="display:none;flex:1;width:100%;border:none;background:#4a4845;" title="PDF Preview"></iframe>
+    </div>
+
+  </div><!-- /#content-split -->
+</div><!-- /#main-wrap -->
+
+<!-- Format helper modal -->
+<div class="modal-backdrop" id="format-modal">
+  <div class="modal">
+    <button class="modal-close" id="format-modal-close">✕</button>
+    <h2>📄 Format helper — πώς να μορφοποιήσεις το αρχείο σου</h2>
+    <h3>Markdown (.md) — προτεινόμενο</h3>
+    <p>Κάθε κεφάλαιο ξεκινά με <code>#</code> για τον τίτλο. Το υπόλοιπο κείμενο είναι απλή παράγραφος.</p>
+    <pre># Τίτλος κεφαλαίου
+
+Εδώ αρχίζει το κείμενο του κεφαλαίου σου.
+Μπορείς να έχεις πολλές παραγράφους.
+
+## Υποκεφάλαιο (προαιρετικό)
+
+Κι άλλο κείμενο εδώ.</pre>
+    <h3>Word (.docx)</h3>
+    <p>Χρησιμοποίησε στυλ <strong>Heading 1</strong> για τον τίτλο κεφαλαίου και <strong>Normal</strong> για το κείμενο.</p>
+    <pre>Heading 1  →  Τίτλος Κεφαλαίου
+Normal     →  Παράγραφος κειμένου
+Heading 2  →  Υποκεφάλαιο</pre>
+    <h3>PDF / TXT</h3>
+    <p>Εξάγεται αυτόματα το κείμενο. Λειτουργεί με PDFs που έχουν επιλέξιμο κείμενο.</p>
+    <h3>Συμβουλές</h3>
+    <p>• Ένα αρχείο = ένα κεφάλαιο. Αν το βιβλίο έχει 5 κεφάλαια, φτιάξε 5 αρχεία.</p>
+    <p>• Έντονο: <code>**κείμενο**</code> · Πλάγιο: <code>*κείμενο*</code> · Em dash: <code>—</code></p>
+    <button class="btn" id="format-modal-ok" style="margin-top:1rem;width:100%">Κατάλαβα</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let state = null;
+
+// ═══════════════════════════════════════════════════════════
+//  SIDEBAR NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const panelNames = {
+  editor: 'Επεξεργαστής',
+  cover: 'Εξώφυλλο',
+  structure: 'Δομή κεφαλαίων',
+};
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.onclick = () => {
+    const panel = btn.dataset.panel;
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + panel).classList.add('active');
+    // Update topbar context label
+    const ctxEl = document.getElementById('ctx-panel-name');
+    if (ctxEl) ctxEl.textContent = panelNames[panel] || panel;
+  };
+});
+
+// ═══════════════════════════════════════════════════════════
+//  BOOK SETTINGS (collapsible)
+// ═══════════════════════════════════════════════════════════
+const bookSettings = document.getElementById('book-settings');
+const settingsPreview = document.getElementById('settings-preview');
+
+document.getElementById('book-settings-toggle').onclick = () => {
+  bookSettings.classList.toggle('open');
+};
+
+function updateSettingsPreview() {
+  const title  = document.getElementById('f_title').value.trim();
+  const author = document.getElementById('f_author').value.trim();
+  if (title || author) {
+    settingsPreview.textContent = [title, author].filter(Boolean).join(' · ');
+  } else {
+    settingsPreview.textContent = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════
+function render() {
+  const themeOpts = (state.available_themes || []).map(t =>
+    `<option value="${t}" ${t === state.theme ? 'selected':''}>${t}</option>`).join('');
+  document.getElementById('f_title').value     = state.title    || '';
+  document.getElementById('f_author').value    = state.author   || '';
+  document.getElementById('f_subtitle').value  = state.subtitle || '';
+  document.getElementById('f_page_size').value = state.page_size || 'A5';
+  document.getElementById('f_theme').innerHTML = themeOpts;
+
+  updateSettingsPreview();
+  updateTopbarTitle();
+  renderChapters();
+}
+
+function updateTopbarTitle() {
+  const nameEl = document.getElementById('topbar-book-name');
+  if (!nameEl) return;
+  const t = (state.title || '').trim();
+  nameEl.textContent = t ? `— ${t}` : '';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHAPTERS
+// ═══════════════════════════════════════════════════════════
+function wordCount(text) {
+  return (text.trim().match(/\S+/g) || []).length;
+}
+function chapterTitle(p) {
+  const m = p.text.match(/^#\s+(.+?)\s*$/m);
+  if (m && m[1].trim()) return m[1].trim();
+  return p.filename.replace(/^\d+-/, '').replace(/\.md$/, '').replace(/_/g, ' ') || 'Κεφάλαιο';
+}
+
+function renderChapters() {
+  const wrap = document.getElementById('chapters-wrap');
+  wrap.innerHTML = '';
+  (state.parts || []).forEach((p, i) => {
+    // Collapse by default unless explicitly opened by the user
+    if (p._collapsed === undefined) p._collapsed = true;
+    wrap.appendChild(makeChapter(p, i));
+  });
+  document.querySelectorAll('textarea[data-i]')
+    .forEach(el => el.addEventListener('input', scheduleAutosave));
+
+  const isEmpty = (state.parts || []).length === 0;
+  const splash   = document.getElementById('empty-splash');
+  const clearBtn = document.getElementById('clear-btn');
+  if (splash)   splash.classList.toggle('visible', isEmpty);
+  if (clearBtn) clearBtn.classList.toggle('visible', !isEmpty);
+}
+
+function makeChapter(p, i) {
+  const wc    = wordCount(p.text);
+  const pages = Math.max(1, Math.round(wc / 250));
+  const div   = document.createElement('div');
+  div.className = 'chapter' + (p._collapsed ? ' collapsed' : '');
+  div.dataset.i = i;
+  div.innerHTML = `
+    <div class="chapter-head">
+      <span class="chapter-num">Κεφ. ${i+1}</span>
+      <div class="chapter-info">
+        <div class="chapter-title">${esc(chapterTitle(p))}</div>
+        <div class="chapter-meta">${wc ? `${wc} λέξεις · ~${pages} σελ.` : 'Κενό κεφάλαιο'}</div>
+      </div>
+      <div class="chapter-actions">
+        <span class="chapter-collapse-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+        <button class="chapter-del" title="Διαγραφή κεφαλαίου" data-del="${i}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <textarea data-i="${i}" rows="8">${esc(p.text)}</textarea>
+    </div>
+  `;
+
+  // Collapse on header click (not on delete)
+  div.querySelector('.chapter-head').addEventListener('click', e => {
+    if (e.target.closest('.chapter-del')) return;
+    p._collapsed = !p._collapsed;
+    div.classList.toggle('collapsed', p._collapsed);
+    // Animate max-height
+    const body = div.querySelector('.chapter-body');
+    if (!p._collapsed) {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      setTimeout(() => { body.style.maxHeight = ''; }, 250);
+    } else {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      requestAnimationFrame(() => { body.style.maxHeight = '0'; });
+    }
+  });
+
+  // Delete
+  div.querySelector('[data-del]').onclick = e => {
+    e.stopPropagation();
+    confirmInline(e.currentTarget, 'Διαγραφή κεφαλαίου;', () => {
+      state.parts.splice(i, 1);
+      renderChapters();
+    });
+  };
+
+  // Live word count + title update
+  const ta      = div.querySelector('textarea');
+  const metaEl  = div.querySelector('.chapter-meta');
+  const titleEl = div.querySelector('.chapter-title');
+  ta.addEventListener('input', () => {
+    const n  = wordCount(ta.value);
+    const pg = Math.max(1, Math.round(n / 250));
+    metaEl.textContent  = n ? `${n} λέξεις · ~${pg} σελ.` : 'Κενό κεφάλαιο';
+    titleEl.textContent = chapterTitle({ text: ta.value, filename: p.filename });
+    p.text = ta.value;
+  });
+
+  return div;
+}
+
+// Add chapter
+document.getElementById('add-chapter-btn').onclick = () => {
+  const n   = (state.parts.length + 1).toString().padStart(2, '0');
+  const fname = `${n}-chapter.md`;
+  state.parts.push({ filename: fname, text: '', _collapsed: false });
+  renderChapters();
+  // Scroll to bottom and focus new textarea
+  const wrap = document.getElementById('chapters-wrap');
+  requestAnimationFrame(() => {
+    wrap.scrollTop = wrap.scrollHeight;
+    const tas = wrap.querySelectorAll('textarea');
+    if (tas.length) tas[tas.length - 1].focus();
+  });
+};
+
+// ═══════════════════════════════════════════════════════════
+//  COLLECT FORM → STATE
+// ═══════════════════════════════════════════════════════════
+function collect() {
+  state.title     = document.getElementById('f_title').value;
+  state.author    = document.getElementById('f_author').value;
+  state.subtitle  = document.getElementById('f_subtitle').value;
+  state.theme     = document.getElementById('f_theme').value;
+  state.page_size = document.getElementById('f_page_size').value;
+  document.querySelectorAll('textarea[data-i]').forEach(ta => {
+    const i = +ta.dataset.i;
+    if (state.parts[i]) state.parts[i].text = ta.value;
+  });
+  updateSettingsPreview();
+  updateTopbarTitle();
+  return {
+    ...state,
+    parts: (state.parts || []).map(({ filename, text }) => ({ filename, text }))
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+async function post(url, body) {
+  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  return { ok: r.ok, data: await r.json() };
+}
+let _toastT = null;
+function showToast(msg, type='ok', dur=2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + type;
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.className = '', dur);
+}
+let _activePop = null;
+function confirmInline(trigger, msg, onYes) {
+  if (_activePop) _activePop.remove();
+  const rect = trigger.getBoundingClientRect();
+  const pop  = document.createElement('div');
+  pop.className = 'confirm-pop';
+  pop.innerHTML = `<span class="confirm-pop-msg">${esc(msg)}</span>
+    <button class="confirm-pop-yes">Ναι</button>
+    <button class="confirm-pop-no">Άκυρο</button>`;
+  document.body.appendChild(pop);
+  _activePop = pop;
+  const pr   = pop.getBoundingClientRect();
+  let top    = rect.bottom + 6;
+  if (top + pr.height > window.innerHeight) top = rect.top - pr.height - 6;
+  let left   = rect.right - pr.width;
+  if (left < 8) left = rect.left;
+  pop.style.top  = `${Math.max(8, top) + scrollY}px`;
+  pop.style.left = `${Math.max(8, left) + scrollX}px`;
+  const cleanup = () => {
+    pop.remove();
+    if (_activePop === pop) _activePop = null;
+    document.removeEventListener('mousedown', outside, true);
+  };
+  const outside = e => { if (!pop.contains(e.target)) cleanup(); };
+  setTimeout(() => document.addEventListener('mousedown', outside, true), 0);
+  pop.querySelector('.confirm-pop-yes').onclick = e => { e.stopPropagation(); cleanup(); onYes(); };
+  pop.querySelector('.confirm-pop-no').onclick  = e => { e.stopPropagation(); cleanup(); };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROGRESS BAR + BUTTON STATE
+// ═══════════════════════════════════════════════════════════
+let _progressTimer = null;
+function setLive(st, label) {
+  // st: null | 'building' | 'ok' | 'error'
+  const bar  = document.getElementById('build-progress');
+  const fill = document.getElementById('build-progress-bar');
+  clearTimeout(_progressTimer);
+  if (!bar) return;
+  if (st === 'building') {
+    bar.className = 'active indeterminate';
+    fill.style.width = '';
+  } else if (st === 'ok') {
+    bar.className = 'active done';
+    fill.style.width = '100%';
+    _progressTimer = setTimeout(() => { bar.className = ''; fill.style.width = '0%'; }, 900);
+  } else if (st === 'error') {
+    bar.className = 'active error';
+    fill.style.width = '100%';
+    _progressTimer = setTimeout(() => { bar.className = ''; fill.style.width = '0%'; }, 1400);
+  } else {
+    bar.className = '';
+    fill.style.width = '0%';
+  }
+}
+function setStatus(msg, type='info') {
+  if (type === 'ok' || type === 'err') showToast(msg, type);
+  else setLive('building');
+}
+
+// Button spinner helpers
+function btnLoading(btn, text) {
+  btn.disabled = true;
+  btn._origHTML = btn.innerHTML;
+  btn.innerHTML = '<span class="btn-spinner"></span>' + text;
+}
+function btnDone(btn, text) {
+  btn.disabled = false;
+  btn.innerHTML = text || btn._origHTML || '';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('buildBtn').click();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  RESIZER
+// ═══════════════════════════════════════════════════════════
+(function initResizer() {
+  const left    = document.getElementById('left');
+  const resizer = document.getElementById('resizer');
+  const split   = document.getElementById('content-split');
+  const MIN_L   = 280;
+  const MIN_R   = 220;
+  const saved   = parseFloat(localStorage.getItem('gb-left-px') || '');
+  if (saved && saved >= MIN_L && saved <= split.clientWidth - MIN_R) {
+    left.style.width = saved + 'px';
+  }
+  let dragging = false;
+  const iframe = document.getElementById('pdf-iframe');
+  resizer.addEventListener('mousedown', e => {
+    dragging = true; resizer.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor     = 'col-resize';
+    if (iframe) iframe.style.pointerEvents = 'none';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    let w = e.clientX - split.getBoundingClientRect().left;
+    w = Math.max(MIN_L, Math.min(w, split.clientWidth - MIN_R));
+    left.style.width = w + 'px';
+  });
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false; resizer.classList.remove('dragging');
+    document.body.style.userSelect = '';
+    document.body.style.cursor     = '';
+    if (iframe) iframe.style.pointerEvents = '';
+    localStorage.setItem('gb-left-px', parseFloat(left.style.width) || '');
+  });
+  resizer.addEventListener('dblclick', () => {
+    left.style.width = '';
+    localStorage.removeItem('gb-left-px');
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  EPUB EXPORT
+// ═══════════════════════════════════════════════════════════
+document.getElementById('epubBtn').onclick = async () => {
+  const btn = document.getElementById('epubBtn');
+  btnLoading(btn, 'EPUB…');
+  setLive('building');
+  const { data } = await post('/api/build-epub', collect());
+  if (data.ok) {
+    showToast(`✓ ${data.filename} έτοιμο!`, 'ok');
+    setLive('ok');
+    const a = document.createElement('a');
+    a.href = '/download.epub?t=' + Date.now(); a.download = data.filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } else {
+    showToast(`✗ ${data.error}`, 'err'); setLive('error');
+  }
+  btnDone(btn, '⬇ EPUB');
+};
+
+// ═══════════════════════════════════════════════════════════
+//  PDF VIEWER  (native browser iframe — no CDN needed)
+// ═══════════════════════════════════════════════════════════
+
+function showPdf() {
+  document.getElementById('pdf-placeholder').style.display = 'none';
+  const iframe = document.getElementById('pdf-iframe');
+  iframe.src = '/preview.pdf?t=' + Date.now();
+  iframe.style.display = 'block';
+  document.getElementById('pdf-toolbar').classList.add('visible');
+  // Show PDF download in topbar
+  const topbarDl = document.getElementById('pdf-download-topbar');
+  if (topbarDl) topbarDl.classList.add('visible');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const pdfDownloadTopbar = document.getElementById('pdf-download-topbar');
+  const pdfDownloadAction = () => {
+    const a = document.createElement('a'); a.href = '/preview.pdf?t=' + Date.now();
+    a.download = 'book.pdf'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  if (pdfDownloadTopbar) pdfDownloadTopbar.onclick = pdfDownloadAction;
+  // legacy id still present in case referenced elsewhere
+  const legacyBtn = document.getElementById('pdf-download');
+  if (legacyBtn) legacyBtn.onclick = pdfDownloadAction;
+});
+
+// ═══════════════════════════════════════════════════════════
+//  LIVE PREVIEW ENGINE
+// ═══════════════════════════════════════════════════════════
+let _debTimer = null, _lastMtime = 0, _pollInt = null;
+const DEBOUNCE_MS = 2500;
+
+function editorPulse(on) {
+  const el = document.getElementById('book-settings-body');
+  if (!el) return;
+  if (on) el.classList.add('autosaving');
+  else    el.classList.remove('autosaving');
+}
+async function triggerAutosave() {
+  collect();
+  setLive('building');
+  editorPulse(true);
+  try {
+    await post('/api/autosave', state);
+    setLive('building');
+    startPolling();
+  } catch(e) { setLive('error'); editorPulse(false); }
+}
+function scheduleAutosave() {
+  clearTimeout(_debTimer);
+  _debTimer = setTimeout(triggerAutosave, DEBOUNCE_MS);
+}
+function startPolling() {
+  if (_pollInt) return;
+  _pollInt = setInterval(async () => {
+    try {
+      const res  = await fetch('/api/build-status');
+      const data = await res.json();
+      if (data.status === 'building') {
+        setLive('building');
+      } else if (data.status === 'ok') {
+        editorPulse(false);
+        if (data.pdf_mtime > _lastMtime) {
+          _lastMtime = data.pdf_mtime;
+          showPdf();
+          setLive('ok');
+        } else { setLive(null); }
+        stopPolling();
+      } else if (data.status === 'error') {
+        editorPulse(false);
+        setLive('error'); stopPolling();
+      }
+    } catch(e) { editorPulse(false); stopPolling(); }
+  }, 800);
+}
+function stopPolling() { clearInterval(_pollInt); _pollInt = null; }
+
+function attachLiveListeners() {
+  document.querySelectorAll('#f_title,#f_author,#f_subtitle,#f_page_size,#f_theme')
+    .forEach(el => el.addEventListener('input', scheduleAutosave));
+  // Also update preview on title/author change
+  document.getElementById('f_title').addEventListener('input', updateSettingsPreview);
+  document.getElementById('f_title').addEventListener('input', updateTopbarTitle);
+  document.getElementById('f_author').addEventListener('input', updateSettingsPreview);
+  document.getElementById('f_author').addEventListener('input', updateTopbarTitle);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BUILD (manual)
+// ═══════════════════════════════════════════════════════════
+document.getElementById('buildBtn').onclick = async () => {
+  const btn = document.getElementById('buildBtn');
+  btnLoading(btn, 'Χτίζεται…');
+  setLive('building');
+  const { data } = await post('/api/build', collect());
+  if (data.ok) {
+    showToast('✓ Έτοιμο!', 'ok');
+    setLive('ok');
+    btnDone(btn, '▶ Build PDF');
+    showPdf();
+  } else {
+    showToast(`✗ ${data.error}`, 'err');
+    setLive('error');
+    btnDone(btn, '▶ Build PDF');
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+//  STRUCTURE PLANNER
+// ═══════════════════════════════════════════════════════════
+let chapData = [];
+function initStructure(n) {
+  chapData = Array.from({ length: n }, (_, i) => chapData[i] || { title:'', mode:'text', text:'', converted:'' });
+  const container = document.getElementById('struct-chapters');
+  container.innerHTML = '';
+  chapData.forEach((ch, ci) => {
+    const div = document.createElement('div');
+    div.className = 'struct-chapter';
+    div.innerHTML = `
+      <div class="struct-chapter-head">
+        <span class="struct-num">Κεφ. ${ci + 1}</span>
+        <input class="struct-chapter-title" placeholder="Τίτλος κεφαλαίου…" value="${esc(ch.title)}">
+      </div>
+      <div class="struct-chapter-body">
+        <div class="mode-toggle">
+          <button class="mode-btn ${ch.mode==='text' ? 'active':''}" data-mode="text">✏️ Κείμενο</button>
+          <button class="mode-btn ${ch.mode==='upload' ? 'active':''}" data-mode="upload">📎 Αρχείο</button>
+        </div>
+        <div class="mode-pane" data-pane="text" style="${ch.mode!=='text' ? 'display:none' : ''}">
+          <textarea class="chap-textarea" data-ci="${ci}" placeholder="Γράψε το κείμενο ή άφησε κενό…">${esc(ch.text)}</textarea>
+        </div>
+        <div class="mode-pane" data-pane="upload" style="${ch.mode!=='upload' ? 'display:none' : ''}">
+          <div class="chap-upload-zone" data-ci="${ci}">${ch.converted ? '✓ Αρχείο φορτώθηκε' : '📂 Κάνε κλικ ή σύρε αρχείο (.docx, .pdf, .txt, .md)'}</div>
+        </div>
+      </div>`;
+    div.querySelectorAll('.mode-btn').forEach(mb => {
+      mb.onclick = () => {
+        const mode = mb.dataset.mode;
+        chapData[ci].mode = mode;
+        div.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+        div.querySelectorAll('.mode-pane').forEach(p => p.style.display = p.dataset.pane === mode ? '' : 'none');
+      };
+    });
+    div.querySelector('.struct-chapter-title').addEventListener('input', e => chapData[ci].title = e.target.value);
+    const ta = div.querySelector('.chap-textarea');
+    if (ta) ta.addEventListener('input', e => chapData[ci].text = e.target.value);
+    const zone = div.querySelector('.chap-upload-zone');
+    if (zone) {
+      zone.onclick = () => { const inp = document.createElement('input'); inp.type='file'; inp.accept='.docx,.pdf,.txt,.md'; inp.onchange = e => { if (e.target.files[0]) handleChapUpload(ci, e.target.files[0], zone); }; inp.click(); };
+      zone.ondragover = e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; };
+      zone.ondragleave = () => zone.style.borderColor = '';
+      zone.ondrop = e => { e.preventDefault(); zone.style.borderColor = ''; if (e.dataTransfer.files[0]) handleChapUpload(ci, e.dataTransfer.files[0], zone); };
+    }
+    container.appendChild(div);
+  });
+}
+async function handleChapUpload(ci, file, zone) {
+  zone.className = 'chap-upload-zone converting';
+  zone.innerHTML = `<span class="upload-spinner"></span> Μετατροπή ${esc(file.name)}…`;
+  try {
+    const form = new FormData(); form.append('file', file, file.name);
+    const res  = await fetch('/api/convert-file', { method:'POST', body: form });
+    const data = await res.json();
+    if (data.ok) {
+      chapData[ci].converted = data.text; chapData[ci].mode = 'upload';
+      zone.className = 'chap-upload-zone has-file';
+      zone.innerHTML = `✓ ${esc(file.name)}`;
+    } else {
+      zone.className = 'chap-upload-zone';
+      zone.innerHTML = `✗ ${esc(data.error||'Σφάλμα')}<br><span style="font-size:.75rem">Προσπάθησε ξανά</span>`;
+    }
+  } catch(e) {
+    zone.className = 'chap-upload-zone';
+    zone.innerHTML = `✗ ${esc(e.message)}<br><span style="font-size:.75rem">Προσπάθησε ξανά</span>`;
+  }
+}
+document.getElementById('chap-count-apply').onclick = () => {
+  const n = Math.max(1, Math.min(50, +document.getElementById('chap-count').value || 1));
+  document.getElementById('chap-count').value = n;
+  initStructure(n);
+};
+document.getElementById('chap-count').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('chap-count-apply').click();
+});
+document.getElementById('struct-apply-btn').onclick = () => {
+  document.querySelectorAll('.chap-textarea').forEach(ta => { chapData[+ta.dataset.ci].text = ta.value; });
+  collect();
+  let added = 0;
+  chapData.forEach((ch, i) => {
+    const title = ch.title.trim() || `Κεφάλαιο ${i + 1}`;
+    const body  = ch.mode === 'upload' ? (ch.converted || '') : ch.text;
+    const safe  = title.replace(/\s+/g,'_').replace(/[^\w\-]/g,'').toLowerCase().slice(0,30) || `chapter${i+1}`;
+    const n     = (state.parts.length + 1).toString().padStart(2,'0');
+    state.parts.push({ filename: `${n}-${safe}.md`, text: `# ${title}\n\n${body.trim() || 'Γράψε εδώ…'}\n` });
+    added++;
+  });
+  renderChapters();
+  document.querySelector('[data-panel="editor"]').click();
+  setStatus(`✓ ${added} κεφάλαια εισήχθησαν.`, 'ok');
+  chapData = []; initStructure(3);
+};
+document.getElementById('format-help-btn').onclick    = () => document.getElementById('format-modal').classList.add('open');
+document.getElementById('format-modal-close').onclick  = () => document.getElementById('format-modal').classList.remove('open');
+document.getElementById('format-modal-ok').onclick     = () => document.getElementById('format-modal').classList.remove('open');
+document.getElementById('format-modal').onclick = e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); };
+initStructure(3);
+
+// ═══════════════════════════════════════════════════════════
+//  EMPTY STATE SPLASH
+// ═══════════════════════════════════════════════════════════
+function hideSplash() {
+  const splash = document.getElementById('empty-splash');
+  if (splash) splash.classList.remove('visible');
+  const clearBtn = document.getElementById('clear-btn');
+  if (clearBtn) clearBtn.classList.add('visible');
+}
+
+function showSplash() {
+  const splash = document.getElementById('empty-splash');
+  if (splash) splash.classList.add('visible');
+  const clearBtn = document.getElementById('clear-btn');
+  if (clearBtn) clearBtn.classList.remove('visible');
+}
+
+// "Δες παράδειγμα" — loads demo_book
+document.getElementById('load-demo-btn').onclick = async () => {
+  const btn = document.getElementById('load-demo-btn');
+  btn.style.opacity = '.6'; btn.style.pointerEvents = 'none';
+  const lbl = btn.querySelector('.spl-label');
+  const orig = lbl.textContent;
+  lbl.textContent = 'Φόρτωση…';
+  try {
+    const res  = await fetch('/api/examples');
+    const data = await res.json();
+    if (!data.ok || !data.examples.length) {
+      showToast('✗ Δεν βρέθηκε παράδειγμα στο φάκελο examples/.', 'err');
+      return;
+    }
+    const ex = data.examples.find(e => e.name === 'demo_book') || data.examples[0];
+    const r2  = await fetch('/api/load-example?name=' + encodeURIComponent(ex.name));
+    const d2  = await r2.json();
+    if (d2.ok) {
+      state = d2.state; render(); attachLiveListeners();
+      _lastMtime = 0; stopPolling();
+      document.getElementById('pdf-iframe').style.display = 'none';
+      document.getElementById('pdf-iframe').src = '';
+      document.getElementById('pdf-toolbar').classList.remove('visible');
+      const _tb1 = document.getElementById('pdf-download-topbar'); if (_tb1) _tb1.classList.remove('visible');
+      document.getElementById('pdf-placeholder').style.display = 'flex';
+      setLive(null);
+      hideSplash();
+      showToast('✓ Φορτώθηκε το παράδειγμα — πάτα Build PDF!', 'ok');
+    } else { showToast('✗ ' + (d2.error || 'Σφάλμα φόρτωσης'), 'err'); }
+  } catch(e) { showToast('✗ Σφάλμα σύνδεσης', 'err'); }
+  lbl.textContent = orig;
+  btn.style.opacity = ''; btn.style.pointerEvents = '';
+};
+
+// "Νέο βιβλίο" — just dismiss the splash and let user type
+document.getElementById('start-blank-btn').onclick = () => {
+  hideSplash();
+  // Focus on the title field
+  document.getElementById('f_title').focus();
+};
+
+// "↩ Νέο βιβλίο" clear button in topbar
+document.getElementById('clear-btn').onclick = e => {
+  confirmInline(e.currentTarget, 'Διαγραφή όλων;', () => {
+    state.parts    = [];
+    state.title    = '';
+    state.author   = '';
+    state.subtitle = '';
+    render();
+    attachLiveListeners();
+    _lastMtime = 0; stopPolling();
+    document.getElementById('pdf-iframe').style.display = 'none';
+    document.getElementById('pdf-iframe').src = '';
+    document.getElementById('pdf-toolbar').classList.remove('visible');
+    const _tb2 = document.getElementById('pdf-download-topbar'); if (_tb2) _tb2.classList.remove('visible');
+    document.getElementById('pdf-placeholder').style.display = 'flex';
+    setLive(null);
+    showSplash();
+  });
+};
+
+// ═══════════════════════════════════════════════════════════
+//  EXAMPLES (save only)
+// ═══════════════════════════════════════════════════════════
+async function loadExamples() { /* panel removed, no-op */ }
+
+// ═══════════════════════════════════════════════════════════
+//  COVER
+// ═══════════════════════════════════════════════════════════
+const coverDrop  = document.getElementById('cover-drop');
+const coverInput = document.getElementById('cover-input');
+coverDrop.onclick = () => coverInput.click();
+coverInput.onchange = e => { if (e.target.files[0]) uploadCover(e.target.files[0]); };
+coverDrop.ondragover  = e => { e.preventDefault(); coverDrop.classList.add('drag-over'); };
+coverDrop.ondragleave = () => coverDrop.classList.remove('drag-over');
+coverDrop.ondrop = e => { e.preventDefault(); coverDrop.classList.remove('drag-over'); if (e.dataTransfer.files[0]) uploadCover(e.dataTransfer.files[0]); };
+function showCoverPreview(url) {
+  const img = document.getElementById('cover-preview');
+  img.src = url;
+  img.style.display = 'block';
+  document.getElementById('cover-placeholder').style.display = 'none';
+  document.getElementById('cover-badge').style.display = 'block';
+  document.getElementById('cover-drop').classList.add('has-image');
+}
+function hideCoverPreview() {
+  document.getElementById('cover-preview').style.display = 'none';
+  document.getElementById('cover-preview').src = '';
+  document.getElementById('cover-placeholder').style.display = 'flex';
+  document.getElementById('cover-badge').style.display = 'none';
+  document.getElementById('cover-drop').classList.remove('has-image');
+}
+async function uploadCover(file) {
+  setStatus('Ανέβασμα εξωφύλλου…');
+  const form = new FormData(); form.append('file', file, file.name);
+  try {
+    const res  = await fetch('/api/upload-cover', { method:'POST', body: form });
+    let data;
+    try { data = await res.json(); }
+    catch(_) { data = { ok: false, error: `Server error ${res.status}` }; }
+    if (data.ok) {
+      setStatus('✓ Εξώφυλλο αποθηκεύτηκε.', 'ok');
+      showCoverPreview('/cover-image?t=' + Date.now());
+      state.cover_image = data.cover_image;
+    } else {
+      const reason = data.error || 'Άγνωστο σφάλμα';
+      setStatus(`✗ Σφάλμα: ${reason}`, 'err');
+      showToast(`✗ ${reason}`, 'err');
+    }
+  } catch(e) {
+    const reason = e.message || 'Αδύνατη η σύνδεση με τον server';
+    setStatus(`✗ Σφάλμα ανεβάσματος: ${reason}`, 'err');
+    showToast(`✗ ${reason}`, 'err');
+  }
+}
+document.getElementById('cover-remove-btn').onclick = e => {
+  confirmInline(e.currentTarget, 'Αφαίρεση εξωφύλλου;', async () => {
+    const { data } = await post('/api/remove-cover', {});
+    if (data.ok) { state.cover_image = ''; hideCoverPreview(); setStatus('✓ Εξώφυλλο αφαιρέθηκε.', 'ok'); }
+  });
+};
+function initCoverPanel() {
+  if (state.cover_image) showCoverPreview('/cover-image?t=' + Date.now());
+  else hideCoverPreview();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DARK MODE
+// ═══════════════════════════════════════════════════════════
+(function initTheme() {
+  const root  = document.documentElement;
+  const saved = localStorage.getItem('gb-theme');
+  const osDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if ((saved === 'dark') || (!saved && osDark)) root.setAttribute('data-theme', 'dark');
+  document.getElementById('theme-toggle').onclick = () => {
+    const dark = root.getAttribute('data-theme') === 'dark';
+    dark ? root.removeAttribute('data-theme') : root.setAttribute('data-theme', 'dark');
+    localStorage.setItem('gb-theme', dark ? 'light' : 'dark');
+  };
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════
+async function init() {
+  state = await (await fetch('/api/state')).json();
+  render();
+  // If state already has chapters (returning user / non-empty book), hide splash
+  if ((state.parts || []).length > 0) hideSplash();
+  try {
+    const s = await (await fetch('/api/build-status')).json();
+    _lastMtime = s.pdf_mtime || 0;
+    if (_lastMtime > 0) showPdf();
+  } catch(e) {}
+  attachLiveListeners();
+  initCoverPanel();
+  setLive(null);
+}
+init();
+</script>
+</body>
+</html>
