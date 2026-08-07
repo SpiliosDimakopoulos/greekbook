@@ -79,7 +79,7 @@ fly volumes list  # Δες τα volumes
 
 ---
 
-## Δομή project
+## Δομή project/folder
 
 ```
 greekbook/           ← Python package
