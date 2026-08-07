@@ -58,7 +58,7 @@ https://greekbook-spilios.fly.dev
 fly deploy
 ```
 
-### Χρήσιμες εντολές
+### Χρήσιμες εντολές :)
 
 ```bash
 fly logs          # Live logs
