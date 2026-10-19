@@ -1,0 +1,10 @@
+title: Το φως του φάρου
+subtitle: Διήγημα
+author: Σπήλιος Δημακόπουλος
+template: novel
+publisher: Εκδόσεις Παράδειγμα
+year: "2026"
+copyright: "© 2026 Σπήλιος Δημακόπουλος. Το κείμενο διατίθεται με άδεια CC BY 4.0."
+dedication: Σε όσους κρατούν ένα φως αναμμένο.
+toc: true
+output: novel.pdf

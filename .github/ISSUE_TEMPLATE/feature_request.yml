@@ -1,0 +1,14 @@
+name: Feature request / Πρόταση
+description: A template, a typographic rule, a university's cover page…
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need? / Τι χρειάζεσαι;
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example (PDF, photo of a printed page, university guidelines)

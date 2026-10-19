@@ -1,0 +1,29 @@
+title: Βελτιστοποίηση διαδρομών οχημάτων με οικογένειες πελατών
+subtitle: Μεθευρετικές μέθοδοι για το πρόβλημα F-CVRP
+author: Όνομα Επώνυμο
+template: thesis
+language: el
+thesis:
+  type: Πτυχιακή Εργασία
+  institution: Πανεπιστήμιο Παράδειγμα
+  school: Σχολή Επιστημών και Τεχνολογίας της Πληροφορίας
+  department: Τμήμα Πληροφορικής
+  student_id: "3190000"
+  supervisor: Καθ. Γεώργιος Παπαδόπουλος
+  committee:
+    - Καθ. Γεώργιος Παπαδόπουλος
+    - Αν. Καθ. Μαρία Νικολάου
+    - Επίκ. Καθ. Νίκος Αντωνίου
+  place: Αθήνα
+  date: Οκτώβριος 2026
+front_matter:
+  - front/abstract.md
+  - front/abstract-en.md
+  - front/acknowledgements.md
+list_of_figures: true
+list_of_tables: true
+bibliography: references.bib
+citation_style: apa
+appendices:
+  - appendix.md
+output: thesis.pdf
