@@ -71,10 +71,16 @@ def test_serve_bad_project(tmp_path: Path) -> None:
 
 
 def test_serve_function_starts_and_stops(novel: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    def interrupt(self: Any) -> None:
-        raise KeyboardInterrupt
+    class CtrlC:
+        def wait(self, timeout: float | None = None) -> bool:
+            raise KeyboardInterrupt  # Ctrl+C while waiting for «Έξοδος»
 
-    monkeypatch.setattr(server.ThreadingHTTPServer, "serve_forever", interrupt)
+    class App(server.App):
+        def __init__(self, *args: Any) -> None:
+            super().__init__(*args)
+            self.quit_requested = CtrlC()  # type: ignore[assignment]
+
+    monkeypatch.setattr(server, "App", App)
     server.serve(novel, port=0, open_browser=False)
 
 

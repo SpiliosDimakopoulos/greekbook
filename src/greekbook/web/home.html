@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>greekbook</title>
+<style>
+:root {
+  --bg: #f6f4f0; --panel: #ffffff; --ink: #1d1b18; --muted: #6f6a62; --line: #e3ded5;
+  --accent: #0b6e75; --accent-ink: #ffffff; --accent-soft: #e2f1f1; --err: #b3261e; --shadow: 0 1px 3px rgba(0,0,0,.08), 0 6px 24px rgba(0,0,0,.06);
+  --sans: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #171614; --panel: #22201d; --ink: #ece8e1; --muted: #a29c92; --line: #38342f;
+          --accent: #5cc1c7; --accent-ink: #0d1b1c; --accent-soft: #1f3a3b; --err: #ff8a80; --shadow: none; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--sans); }
+header { display: flex; align-items: center; padding: 14px 28px; }
+header .logo { font-weight: 700; font-size: 19px; letter-spacing: -.01em; }
+header .spacer { flex: 1; }
+main { max-width: 980px; margin: 0 auto; padding: 8px 24px 64px; }
+h1 { font-size: clamp(28px, 4vw, 38px); margin: 24px 0 6px; letter-spacing: -.02em; }
+.lead { color: var(--muted); margin: 0 0 28px; font-size: 18px; }
+.kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.kind { display: flex; flex-direction: column; align-items: flex-start; text-align: left; background: var(--panel); border: 2px solid transparent; border-radius: 16px;
+        padding: 22px; cursor: pointer; box-shadow: var(--shadow); color: var(--ink); font: inherit; }
+.kind:hover, .kind:focus-visible { border-color: var(--accent); outline: none; }
+.kind .icon { font-size: 34px; }
+.kind b { display: block; font-size: 19px; margin: 8px 0 4px; }
+.kind span { color: var(--muted); font-size: 15px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0 8px; }
+button, .btn { font: inherit; font-size: 15px; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+               padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+button:hover, .btn:hover { border-color: var(--accent); color: var(--accent); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button.primary:hover { filter: brightness(1.08); color: var(--accent-ink); }
+button:disabled { opacity: .6; cursor: progress; }
+h2 { font-size: 20px; margin: 40px 0 12px; }
+.projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.project { background: var(--panel); border-radius: 12px; padding: 16px 18px; cursor: pointer; border: 1px solid var(--line);
+           text-align: left; font: inherit; color: var(--ink); }
+.project:hover { border-color: var(--accent); }
+.project b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project small { color: var(--muted); }
+.empty { color: var(--muted); background: var(--panel); border-radius: 12px; padding: 18px; border: 1px dashed var(--line); }
+.where { color: var(--muted); font-size: 13px; margin-top: 10px; word-break: break-all; }
+dialog { border: 0; border-radius: 18px; padding: 0; width: min(560px, 94vw); background: var(--panel); color: var(--ink);
+         box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+dialog::backdrop { background: rgba(20,18,15,.45); }
+dialog form { padding: 24px 26px; }
+dialog h3 { margin: 0 0 4px; font-size: 22px; }
+dialog p.sub { margin: 0 0 18px; color: var(--muted); }
+label { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 5px; }
+label small { font-weight: 400; color: var(--muted); }
+input[type=text], select, textarea { width: 100%; font: inherit; padding: 10px 12px; border-radius: 10px;
+         border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; margin-top: 18px; }
+.check input { margin-top: 4px; width: 18px; height: 18px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.error { color: var(--err); margin-top: 12px; min-height: 1em; }
+.busy { position: fixed; inset: 0; display: none; place-items: center; background: rgba(20,18,15,.35); z-index: 10; }
+.busy div { background: var(--panel); padding: 18px 26px; border-radius: 14px; box-shadow: var(--shadow); }
+@media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">greekbook</span>
+  <span class="spacer"></span>
+  <button id="quit" title="Κλείνει την εφαρμογή">Έξοδος</button>
+</header>
+<main>
+  <h1>Τι θα γράψεις σήμερα;</h1>
+  <p class="lead">Διάλεξε και ξεκίνα. Όλα αποθηκεύονται αυτόματα στον υπολογιστή σου.</p>
+
+  <div class="kinds">
+    <button class="kind" data-kind="thesis"><div class="icon">🎓</div><b>Πτυχιακή ή διπλωματική</b>
+      <span>Εξώφυλλο, περιλήψεις, περιεχόμενα, βιβλιογραφία, έτοιμο PDF για τη γραμματεία.</span></button>
+    <button class="kind" data-kind="book"><div class="icon">📖</div><b>Βιβλίο</b>
+      <span>Μυθιστόρημα, διηγήματα ή ποίηση, σε σελίδες σαν τυπωμένου βιβλίου και σε e-book.</span></button>
+    <button class="kind" data-kind="notes"><div class="icon">📝</div><b>Σημειώσεις ή άρθρο</b>
+      <span>Σημειώσεις μαθήματος, εργασία εξαμήνου, τεχνική αναφορά.</span></button>
+  </div>
+
+  <div class="row">
+    <button id="import">📄 Έχω ήδη κείμενο στο Word (.docx)</button>
+    <button id="open-path">📂 Άνοιγμα εργασίας από φάκελο</button>
+    <input type="file" id="docx" accept=".docx" hidden>
+  </div>
+
+  <h2>Οι εργασίες σου</h2>
+  <div id="projects" class="projects"></div>
+  <div class="where" id="where"></div>
+</main>
+
+<dialog id="create">
+  <form method="dialog" id="create-form">
+    <h3 id="create-title">Νέα εργασία</h3>
+    <p class="sub">Όλα αλλάζουν και αργότερα από τις «Ρυθμίσεις».</p>
+    <label for="f-title">Τίτλος</label>
+    <input type="text" id="f-title" required autocomplete="off" placeholder="π.χ. Η επίδραση της κλιματικής αλλαγής στη γεωργία">
+    <label for="f-author">Το όνομά σου</label>
+    <input type="text" id="f-author" autocomplete="name" placeholder="Όνομα Επώνυμο">
+    <div id="thesis-fields">
+      <label for="f-type">Είδος εργασίας</label>
+      <select id="f-type">
+        <option>Πτυχιακή Εργασία</option><option>Διπλωματική Εργασία</option>
+        <option>Μεταπτυχιακή Διπλωματική Εργασία</option><option>Διδακτορική Διατριβή</option>
+      </select>
+      <div class="grid2">
+        <div><label for="f-inst">Πανεπιστήμιο</label><input type="text" id="f-inst" placeholder="π.χ. Πανεπιστήμιο Πατρών"></div>
+        <div><label for="f-dept">Τμήμα</label><input type="text" id="f-dept" placeholder="π.χ. Τμήμα Βιολογίας"></div>
+      </div>
+      <label for="f-sup">Επιβλέπων/ουσα <small>(προαιρετικό)</small></label>
+      <input type="text" id="f-sup" placeholder="π.χ. Καθ. Μαρία Παπαδοπούλου">
+    </div>
+    <label class="check"><input type="checkbox" id="f-example">
+      <span>Ξεκίνα με ένα <b>πλήρες παράδειγμα</b>, για να δεις πώς μπαίνουν εικόνες, πίνακες και παραπομπές.
+      Χωρίς αυτό, ξεκινάς με λίγες σελίδες-οδηγό.</span></label>
+    <div class="error" id="create-error" role="alert"></div>
+    <div class="actions">
+      <button type="button" id="create-cancel">Άκυρο</button>
+      <button type="submit" class="primary" id="create-ok">Δημιουργία</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="open">
+  <form method="dialog" id="open-form">
+    <h3>Άνοιγμα εργασίας</h3>
+    <p class="sub">Επικόλλησε τη διαδρομή του φακέλου που περιέχει το <code>book.yaml</code>.</p>
+    <input type="text" id="o-path" placeholder="π.χ. C:\Users\Maria\Documents\greekbook\i-ergasia-mou">
+    <div class="error" id="open-error" role="alert"></div>
+    <div class="actions">
+      <button type="button" id="open-cancel">Άκυρο</button>
+      <button type="submit" class="primary">Άνοιγμα</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="import-kind">
+  <form method="dialog" id="import-form">
+    <h3>Εισαγωγή από Word</h3>
+    <p class="sub">Τι είναι το κείμενο; Τα κεφάλαια χωρίζονται εκεί όπου στο Word έχεις «Επικεφαλίδα 1».</p>
+    <select id="i-kind">
+      <option value="thesis">Πτυχιακή ή διπλωματική</option>
+      <option value="book">Βιβλίο</option>
+      <option value="notes">Σημειώσεις ή άρθρο</option>
+    </select>
+    <div class="error" id="import-error" role="alert"></div>
+    <div class="actions">
+      <button type="button" id="import-cancel">Άκυρο</button>
+      <button type="submit" class="primary">Επιλογή αρχείου…</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="busy" id="busy"><div id="busy-text">Μια στιγμή…</div></div>
+
+<script>
+const TOKEN = "__TOKEN__";
+const $ = (id) => document.getElementById(id);
+const KIND_TITLES = {thesis: "Νέα πτυχιακή ή διπλωματική", book: "Νέο βιβλίο", notes: "Νέες σημειώσεις ή άρθρο"};
+const TEMPLATE_NAMES = {thesis: "Πτυχιακή", academic: "Σημειώσεις/άρθρο", novel: "Βιβλίο", classic: "Βιβλίο (κλασικό)",
+                        sepia: "Βιβλίο (sepia)", clean: "Οδηγός"};
+let kind = "thesis";
+
+async function api(path, body, extra = {}) {
+  const opts = {method: body === undefined ? "GET" : "POST", headers: {"X-Greekbook-Token": TOKEN, ...extra}};
+  if (body !== undefined) opts.body = body instanceof Blob || body instanceof ArrayBuffer ? body : JSON.stringify(body);
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) throw new Error(data.error || "Κάτι πήγε στραβά.");
+  return data;
+}
+function busy(text) { $("busy-text").textContent = text; $("busy").style.display = text ? "grid" : "none"; }
+
+function ago(ts) {
+  const s = Date.now() / 1000 - ts;
+  if (s < 90) return "μόλις τώρα";
+  if (s < 3600) return `πριν ${Math.round(s / 60)} λεπτά`;
+  if (s < 86400) return `πριν ${Math.round(s / 3600)} ώρες`;
+  const d = Math.round(s / 86400);
+  return d === 1 ? "χθες" : `πριν ${d} μέρες`;
+}
+
+async function load() {
+  const info = await api("/api/app");
+  const box = $("projects");
+  box.textContent = "";
+  if (!info.projects.length) {
+    box.innerHTML = '<div class="empty">Δεν έχεις ακόμα εργασίες. Διάλεξε τι θα γράψεις από πάνω.</div>';
+  }
+  for (const p of info.projects) {
+    const b = document.createElement("button");
+    b.className = "project";
+    b.innerHTML = "<b></b><small></small>";
+    b.querySelector("b").textContent = p.title;
+    b.querySelector("small").textContent = `${TEMPLATE_NAMES[p.template] || p.template} · ${ago(p.modified)}`;
+    b.title = p.path;
+    b.onclick = () => openProject(p.path);
+    box.append(b);
+  }
+  $("where").textContent = `Οι νέες εργασίες αποθηκεύονται στο: ${info.workspace}`;
+}
+
+async function openProject(path) {
+  busy("Άνοιγμα…");
+  try { await api("/api/projects/open", {path}); location.href = "/"; }
+  catch (e) { busy(""); alert(e.message); }
+}
+
+document.querySelectorAll(".kind").forEach((el) => el.onclick = () => {
+  kind = el.dataset.kind;
+  $("create-title").textContent = KIND_TITLES[kind];
+  $("thesis-fields").style.display = kind === "thesis" ? "" : "none";
+  $("create-error").textContent = "";
+  $("create").showModal();
+  $("f-title").focus();
+});
+$("create-cancel").onclick = () => $("create").close();
+$("create-form").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const data = {kind, title: $("f-title").value, author: $("f-author").value, example: $("f-example").checked};
+  if (kind === "thesis") data.thesis = {type: $("f-type").value, institution: $("f-inst").value,
+                                        department: $("f-dept").value, supervisor: $("f-sup").value};
+  $("create-ok").disabled = true;
+  try { await api("/api/projects/create", data); location.href = "/"; }
+  catch (e) { $("create-error").textContent = e.message; $("create-ok").disabled = false; }
+};
+
+$("open-path").onclick = () => { $("open-error").textContent = ""; $("open").showModal(); $("o-path").focus(); };
+$("open-cancel").onclick = () => $("open").close();
+$("open-form").onsubmit = async (ev) => {
+  ev.preventDefault();
+  try { await api("/api/projects/open", {path: $("o-path").value.trim().replace(/^"|"$/g, "")}); location.href = "/"; }
+  catch (e) { $("open-error").textContent = e.message; }
+};
+
+$("import").onclick = () => { $("import-error").textContent = ""; $("import-kind").showModal(); };
+$("import-cancel").onclick = () => $("import-kind").close();
+$("import-form").onsubmit = (ev) => { ev.preventDefault(); $("docx").click(); };
+$("docx").onchange = async () => {
+  const file = $("docx").files[0];
+  if (!file) return;
+  $("import-kind").close();
+  busy("Εισαγωγή του εγγράφου…");
+  try {
+    const res = await api(`/api/projects/import?kind=${$("i-kind").value}`, await file.arrayBuffer(),
+                          {"X-Filename": encodeURIComponent(file.name)});
+    if (res.warnings.length) alert(res.warnings.join("\n"));
+    location.href = "/";
+  } catch (e) { busy(""); alert(e.message); }
+  $("docx").value = "";
+};
+
+$("quit").onclick = async () => {
+  if (!confirm("Να κλείσει το greekbook; Όλα έχουν αποθηκευτεί.")) return;
+  await api("/api/quit", {});
+  document.body.innerHTML = '<main><h1>Το greekbook έκλεισε.</h1><p class="lead">Μπορείς να κλείσεις αυτή την καρτέλα.</p></main>';
+};
+
+load().catch((e) => { $("projects").innerHTML = ""; $("where").textContent = e.message; });
+</script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -13,6 +14,8 @@ from .markdown import Code, Diagnostic, markdown_to_typst, relative_base, string
 PACKAGE_DIR = Path(__file__).parent / "typst" / "packages"
 FONTS_DIR = Path(__file__).parent / "fonts"
 LIB_IMPORT = '#import "@local/greekbook:0.2.0": *'
+# A citation (not a cross-reference such as @fig:x).
+_CITATION_RE = re.compile(r"(?<![\w@.\\])-?@(?!(?:fig|tbl|eq|sec|lst|ch|app):)\w")
 
 
 class BuildError(Exception):
@@ -120,7 +123,9 @@ def generate_typst(cfg: BookConfig) -> tuple[str, list[Diagnostic]]:
         parts.append(_convert_file(path, cfg, diagnostics))
 
     bib = cfg.bibliography_files()
-    if bib:
+    sources = [*front, *cfg.chapter_files(), *cfg.appendix_files()]
+    cited = any(_CITATION_RE.search(p.read_text(encoding="utf-8")) for p in sources)
+    if bib and cited:  # an uncited bibliography would print an empty heading
         style = CITATION_STYLES.get(cfg.citation_style, cfg.citation_style)
         if style.endswith(".csl"):
             style = _root_path(root / style, root)
@@ -154,9 +159,8 @@ def compile_typst(
         result: bytes | list[bytes] | None = compiler.compile(
             source.encode("utf-8"), format=fmt, ppi=ppi, pdf_standards=standards
         )
-    except typst.TypstError as exc:  # pragma: no cover - message formatting only
-        hints = "".join(f"\n  hint: {h}" for h in getattr(exc, "hints", []) or [])
-        raise BuildError(f"{exc.message}{hints}") from exc
+    except typst.TypstError as exc:
+        raise BuildError(humanize_typst_error(exc.message)) from exc
     if result is None:  # pragma: no cover - only when an output path is given
         raise BuildError("Typst did not return a document")
     return result
@@ -174,3 +178,43 @@ def build(cfg: BookConfig, output: Path | None = None, keep_typst: bool = False)
     if keep_typst:
         out.with_suffix(".typ").write_text(source, encoding="utf-8")
     return BuildResult(out, source, diagnostics, time.perf_counter() - started)
+
+
+_TYPST_ERRORS: list[tuple[re.Pattern[str], str]] = [
+    (
+        re.compile(r"file not found \(searched at (?P<path>.+?)\)"),
+        "Δεν βρέθηκε το αρχείο «{name}». Έλεγξε ότι η εικόνα υπάρχει στον φάκελο της "
+        "εργασίας και ότι το όνομά της είναι γραμμένο σωστά.",
+    ),
+    (
+        re.compile(r"label `<(?P<label>[^>]+)>` does not exist"),
+        "Η παραπομπή @{label} δεν αντιστοιχεί σε κάτι: δεν υπάρχει σχήμα, πίνακας, "
+        "εξίσωση ή ενότητα με ετικέτα {{#{label}}}.",
+    ),
+    (
+        re.compile(r"key `(?P<key>[^`]+)` does not exist in the bibliography"),
+        "Η πηγή @{key} δεν υπάρχει στη βιβλιογραφία. Πρόσθεσέ τη στο αρχείο .bib "
+        "ή διόρθωσε το κλειδί.",
+    ),
+    (
+        re.compile(r"failed to decode image|unknown image format", re.IGNORECASE),
+        "Μια εικόνα δεν διαβάζεται: είναι κατεστραμμένη ή σε μορφή που δεν υποστηρίζεται "
+        "(δεκτές: PNG, JPG, GIF, SVG, WebP).",
+    ),
+    (
+        re.compile(r"unknown font family|font .* not found", re.IGNORECASE),
+        "Η γραμματοσειρά που διάλεξες δεν είναι εγκατεστημένη στον υπολογιστή.",
+    ),
+]
+
+
+def humanize_typst_error(message: str) -> str:
+    """Turn the commonest Typst errors into plain Greek; keep the original for the rest."""
+    for pattern, template in _TYPST_ERRORS:
+        m = pattern.search(message)
+        if m:
+            groups = m.groupdict()
+            if "path" in groups:
+                groups["name"] = Path(groups["path"]).name
+            return template.format(**groups)
+    return f"Πρόβλημα στη στοιχειοθεσία: {message}"

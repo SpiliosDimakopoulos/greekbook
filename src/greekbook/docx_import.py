@@ -12,12 +12,13 @@ Requires the optional dependency: ``pip install "greekbook[docx]"``.
 from __future__ import annotations
 
 import re
-import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+from .projects import slugify
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
@@ -41,49 +42,8 @@ def _escape(text: str) -> str:
     return _MD_SPECIAL_RE.sub(r"\\\1", text)
 
 
-_TRANSLIT = dict(
-    zip(
-        "αβγδεζηθικλμνξοπρσςτυφχψω",
-        [
-            "a",
-            "v",
-            "g",
-            "d",
-            "e",
-            "z",
-            "i",
-            "th",
-            "i",
-            "k",
-            "l",
-            "m",
-            "n",
-            "x",
-            "o",
-            "p",
-            "r",
-            "s",
-            "s",
-            "t",
-            "y",
-            "f",
-            "ch",
-            "ps",
-            "o",
-        ],
-        strict=True,
-    )
-)
-
-
 def _slug(text: str) -> str:
-    """ASCII file-name slug; Greek is transliterated (Εισαγωγή → eisagogi)."""
-    plain = "".join(
-        c for c in unicodedata.normalize("NFD", text.lower()) if not unicodedata.combining(c)
-    )
-    latin = "".join(_TRANSLIT.get(c, c) for c in plain)
-    latin = latin.replace("oy", "ou").replace("ey", "ev").replace("ay", "av")
-    return re.sub(r"[^a-z0-9]+", "-", latin).strip("-")[:40] or "chapter"
+    return slugify(text, fallback="chapter")
 
 
 class _Converter:
