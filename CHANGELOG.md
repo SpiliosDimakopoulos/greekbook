@@ -18,6 +18,10 @@ A rewrite on top of [Typst](https://typst.app).
 - Greek typography: nested quotes, capitals without accents (ΤΣΑΪ), Greek
   numerals, no-break spaces after abbreviations, number-only references.
 - `greekbook new`, `watch`, `validate` (Greek-specific linting), `doctor`, `templates`.
+- `greekbook import thesis.docx`: Word documents become projects (chapters, lists,
+  tables, images, footnotes).
+- `greekbook serve`: local editor with live page preview and lint panel, bound to
+  127.0.0.1 with Host and token checks.
 - EPUB 3 with soft hyphens from the Greek syllabifier.
 - Test suite (unit, end-to-end PDF, property-based), CI on three OSes.
 

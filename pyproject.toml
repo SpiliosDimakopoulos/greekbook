@@ -51,6 +51,7 @@ dev = [
     "mypy>=1.10",
     "types-PyYAML",
     "python-docx>=1.1",
+    "Pillow>=10",
 ]
 
 [project.scripts]
@@ -85,7 +86,7 @@ strict = true
 files = ["src/greekbook"]
 
 [[tool.mypy.overrides]]
-module = ["typst", "ebooklib", "ebooklib.*", "docx", "mdit_py_plugins.*"]
+module = ["typst", "ebooklib", "ebooklib.*", "docx", "docx.*", "lxml", "lxml.*", "mdit_py_plugins.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

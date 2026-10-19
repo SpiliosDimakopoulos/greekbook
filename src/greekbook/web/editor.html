@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>greekbook</title>
+<style>
+:root {
+  --bg: #f6f4f0; --panel: #ffffff; --ink: #1d1b18; --muted: #6f6a62; --line: #e3ded5;
+  --accent: #0b6e75; --accent-soft: #e2f1f1; --warn: #a15c00; --err: #b3261e; --page-bg: #d9d4cb;
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  --sans: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #171614; --panel: #1f1e1b; --ink: #ece8e1; --muted: #a29c92; --line: #34312c;
+          --accent: #5cc1c7; --accent-soft: #1f3a3b; --warn: #f0b45c; --err: #ff8a80; --page-bg: #2a2825; }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans);
+       display: grid; grid-template-rows: auto 1fr; }
+header { display: flex; align-items: center; gap: 12px; padding: 8px 14px;
+         border-bottom: 1px solid var(--line); background: var(--panel); }
+header h1 { font-size: 15px; margin: 0; font-weight: 650; }
+header .title { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+header .spacer { flex: 1; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pill.err { background: color-mix(in srgb, var(--err) 15%, transparent); color: var(--err); }
+button, .btn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+               padding: 5px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; }
+button:hover, .btn:hover { border-color: var(--accent); color: var(--accent); }
+main { display: grid; grid-template-columns: 220px minmax(320px, 1fr) minmax(320px, 1fr); min-height: 0; }
+nav { border-right: 1px solid var(--line); overflow: auto; padding: 10px 6px; background: var(--panel); }
+nav h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 14px 8px 4px; }
+nav a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+nav a.active { background: var(--accent-soft); color: var(--accent); }
+nav button { margin: 12px 8px; width: calc(100% - 16px); }
+.editor { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; border-right: 1px solid var(--line); }
+.toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.toolbar button { padding: 3px 8px; font-size: 13px; }
+textarea { width: 100%; height: 100%; resize: none; border: 0; outline: none; padding: 18px 22px;
+           background: var(--panel); color: var(--ink); font: 15px/1.7 var(--mono); tab-size: 4; }
+.issues { max-height: 30%; overflow: auto; border-top: 1px solid var(--line); background: var(--panel); font-size: 13px; }
+.issues div { padding: 4px 12px; cursor: pointer; border-bottom: 1px solid var(--line); }
+.issues div:hover { background: var(--accent-soft); }
+.issues .error { color: var(--err); } .issues .warning { color: var(--warn); }
+.preview { overflow: auto; background: var(--page-bg); padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.preview img { width: min(100%, var(--zoom, 560px)); background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.preview .error-box { background: var(--panel); color: var(--err); padding: 14px; border-radius: 8px; white-space: pre-wrap; font: 13px var(--mono); max-width: 560px; }
+.zoom { display: flex; gap: 4px; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } nav, .preview { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>greekbook</h1><span class="title" id="book-title"></span>
+  <span class="spacer"></span>
+  <span class="pill" id="status">…</span>
+  <span class="zoom"><button id="zoom-out" title="Σμίκρυνση">−</button><button id="zoom-in" title="Μεγέθυνση">+</button></span>
+  <a class="btn" href="/book.pdf" target="_blank" rel="noopener">PDF</a>
+</header>
+<main>
+  <nav id="files"></nav>
+  <section class="editor">
+    <div class="toolbar">
+      <button data-wrap="**" title="Έντονα (Ctrl+B)"><b>B</b></button>
+      <button data-wrap="*" title="Πλάγια (Ctrl+I)"><i>I</i></button>
+      <button data-insert="^[υποσημείωση]" title="Υποσημείωση">¹</button>
+      <button data-insert="[@κλειδί]" title="Παραπομπή">[@]</button>
+      <button data-insert="&#10;&#10;![Λεζάντα](figures/εικόνα.png){#fig:x width=70%}&#10;&#10;" title="Εικόνα">Εικόνα</button>
+      <button data-insert="&#10;&#10;| Α | Β |&#10;|---|---|&#10;| 1 | 2 |&#10;&#10;Table: Λεζάντα {#tbl:x}&#10;&#10;" title="Πίνακας">Πίνακας</button>
+      <button data-insert="&#10;&#10;$$ x^2 $$ (eq:x)&#10;&#10;" title="Εξίσωση">Εξίσωση</button>
+      <button data-insert="&#10;&#10;---&#10;&#10;" title="Αλλαγή σκηνής">⁂</button>
+    </div>
+    <textarea id="text" spellcheck="true" lang="el" disabled></textarea>
+    <div class="issues" id="issues"></div>
+  </section>
+  <section class="preview" id="preview"></section>
+</main>
+<script>
+const TOKEN = "__TOKEN__";
+const GROUPS = {settings: "Ρυθμίσεις", front: "Αρχικές σελίδες", chapters: "Κεφάλαια",
+                appendices: "Παραρτήματα", bibliography: "Βιβλιογραφία"};
+const $ = (id) => document.getElementById(id);
+let current = null, saveTimer = null, version = -1, dirty = false, zoom = 560;
+
+async function api(path, opts = {}) {
+  opts.headers = {...(opts.headers || {}), "X-Greekbook-Token": TOKEN};
+  const res = await fetch(path, opts);
+  if (!res.ok) throw new Error(await res.text());
+  return res;
+}
+
+async function loadFiles(select) {
+  const files = await (await api("/api/files")).json();
+  const nav = $("files");
+  nav.textContent = "";
+  let group = null;
+  for (const f of files) {
+    if (f.group !== group) {
+      group = f.group;
+      const h = document.createElement("h2");
+      h.textContent = GROUPS[group] || group;
+      nav.append(h);
+    }
+    const a = document.createElement("a");
+    a.textContent = f.path.split("/").pop();
+    a.title = f.path;
+    a.dataset.path = f.path;
+    a.onclick = () => openFile(f.path);
+    nav.append(a);
+  }
+  const add = document.createElement("button");
+  add.textContent = "+ Νέο κεφάλαιο";
+  add.onclick = newChapter;
+  nav.append(add);
+  const target = select || current || (files.find(f => f.group === "chapters") || files[0]).path;
+  await openFile(target);
+}
+
+async function openFile(path) {
+  if (dirty) await save();
+  const text = await (await api("/api/file?path=" + encodeURIComponent(path))).text();
+  current = path;
+  const ta = $("text");
+  ta.value = text;
+  ta.disabled = false;
+  ta.setSelectionRange(0, 0);
+  ta.focus();
+  ta.scrollTop = 0;
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("active", a.dataset.path === path));
+}
+
+async function save() {
+  if (!current) return;
+  clearTimeout(saveTimer);
+  dirty = false;
+  await api("/api/file?path=" + encodeURIComponent(current), {method: "PUT", body: $("text").value});
+  setStatus("Δημιουργία…");
+  if (current === "book.yaml") loadFiles(current);
+}
+
+async function newChapter() {
+  const title = prompt("Τίτλος νέου κεφαλαίου:");
+  if (!title) return;
+  const res = await api("/api/chapter", {method: "POST", body: JSON.stringify({title})});
+  const {path} = await res.json();
+  await loadFiles(path);
+}
+
+function setStatus(text, error = false) {
+  const s = $("status");
+  s.textContent = text;
+  s.classList.toggle("err", error);
+}
+
+async function poll() {
+  try {
+    const st = await (await api("/api/status")).json();
+    if (st.building) setStatus("Δημιουργία…");
+    if (st.version !== version && !st.building) {
+      version = st.version;
+      renderPreview(st);
+    }
+  } catch (e) {
+    setStatus("Ο server σταμάτησε", true);
+  }
+  setTimeout(poll, 600);
+}
+
+function renderPreview(st) {
+  if (st.title) { $("book-title").textContent = st.title; document.title = st.title + " · greekbook"; }
+  const preview = $("preview");
+  const scroll = preview.scrollTop;
+  if (!st.ok) {
+    setStatus("Σφάλμα", true);
+    preview.textContent = "";
+    const box = document.createElement("div");
+    box.className = "error-box";
+    box.textContent = st.error;
+    preview.append(box);
+  } else {
+    setStatus(`${st.pages} σελίδες · ${st.seconds}s`);
+    const imgs = [...preview.querySelectorAll("img")];
+    preview.querySelectorAll(".error-box").forEach(e => e.remove());
+    for (let i = 0; i < st.pages; i++) {
+      const img = imgs[i] || preview.appendChild(document.createElement("img"));
+      img.alt = `Σελίδα ${i + 1}`;
+      img.src = `/page/${i}.svg?v=${st.version}`;
+    }
+    imgs.slice(st.pages).forEach(img => img.remove());
+    preview.scrollTop = scroll;
+  }
+  const issues = $("issues");
+  issues.textContent = "";
+  for (const i of [...st.issues, ...st.diagnostics.map(d => ({message: d, level: "warning"}))]) {
+    const d = document.createElement("div");
+    d.className = i.level;
+    d.textContent = i.file ? `${i.file}:${i.line} — ${i.message}` : i.message;
+    if (i.file) d.onclick = () => jumpTo(i.file, i.line);
+    issues.append(d);
+  }
+}
+
+async function jumpTo(file, line) {
+  if (file !== current) await openFile(file);
+  const ta = $("text");
+  const lines = ta.value.split("\n");
+  const start = lines.slice(0, Math.max(line - 1, 0)).join("\n").length + (line > 1 ? 1 : 0);
+  ta.focus();
+  ta.setSelectionRange(start, start + (lines[line - 1] || "").length);
+  ta.scrollTop = (line - 5) * parseFloat(getComputedStyle(ta).lineHeight);
+}
+
+function insertText(before, after = "") {
+  const ta = $("text");
+  const [s, e] = [ta.selectionStart, ta.selectionEnd];
+  const selected = ta.value.slice(s, e);
+  ta.setRangeText(before + selected + after, s, e, "end");
+  if (!selected && after) ta.setSelectionRange(s + before.length, s + before.length);
+  ta.dispatchEvent(new Event("input"));
+  ta.focus();
+}
+
+$("text").addEventListener("input", () => {
+  dirty = true;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 600);
+});
+$("text").addEventListener("keydown", (ev) => {
+  if (!(ev.ctrlKey || ev.metaKey)) return;
+  const k = ev.key.toLowerCase();
+  if (k === "s") { ev.preventDefault(); save(); }
+  if (k === "b") { ev.preventDefault(); insertText("**", "**"); }
+  if (k === "i") { ev.preventDefault(); insertText("*", "*"); }
+});
+document.querySelectorAll("[data-wrap]").forEach(b => b.onclick = () => insertText(b.dataset.wrap, b.dataset.wrap));
+document.querySelectorAll("[data-insert]").forEach(b => b.onclick = () => insertText(b.dataset.insert));
+$("zoom-in").onclick = () => { zoom = Math.min(zoom + 80, 1400); $("preview").style.setProperty("--zoom", zoom + "px"); };
+$("zoom-out").onclick = () => { zoom = Math.max(zoom - 80, 240); $("preview").style.setProperty("--zoom", zoom + "px"); };
+window.addEventListener("beforeunload", () => { if (dirty) save(); });
+
+loadFiles().then(poll).catch(e => setStatus(String(e), true));
+</script>
+</body>
+</html>

@@ -59,6 +59,22 @@ def cmd_new(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_import(args: argparse.Namespace) -> int:
+    from .docx_import import ImportError_, import_docx
+
+    target = Path(args.directory) if args.directory else Path(Path(args.docx).stem)
+    try:
+        warnings = import_docx(Path(args.docx), target, args.template)
+    except ImportError_ as exc:
+        fail(str(exc))
+        return 1
+    for w in warnings:
+        warn(w)
+    ok(f"Εισαγωγή του {args.docx} στο {target}")
+    print(f"\n  Έλεγξε το {target / 'book.yaml'} και τρέξε: greekbook build {target}\n")
+    return 0
+
+
 def cmd_build(args: argparse.Namespace) -> int:
     try:
         cfg = load_config(_project(args.project))
@@ -120,6 +136,23 @@ def cmd_watch(args: argparse.Namespace) -> int:
     except KeyboardInterrupt:
         print()
         return 0
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    from .server import serve
+
+    root = _project(args.project)
+    try:
+        load_config(root)
+    except ConfigError as exc:
+        fail(str(exc))
+        return 1
+    try:
+        serve(root, args.port, open_browser=not args.no_browser)
+    except OSError as exc:
+        fail(f"Δεν ξεκίνησε ο server στη θύρα {args.port}: {exc}")
+        return 1
+    return 0
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
@@ -211,6 +244,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.set_defaults(func=cmd_new)
 
+    p = sub.add_parser("import", help="εισαγωγή εγγράφου Word (.docx) σε νέο project")
+    p.add_argument("docx", help="το αρχείο .docx")
+    p.add_argument("directory", nargs="?", help="φάκελος του νέου project")
+    p.add_argument("-t", "--template", choices=TEMPLATES, default="thesis")
+    p.set_defaults(func=cmd_import)
+
     p = sub.add_parser("build", help="δημιουργία PDF (και EPUB)")
     p.add_argument("project", nargs="?", default=".", help="φάκελος ή book.yaml (προεπιλογή: .)")
     p.add_argument("-o", "--output", help="αρχείο εξόδου")
@@ -225,6 +264,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("project", nargs="?", default=".")
     p.add_argument("--interval", type=float, default=0.7, help=argparse.SUPPRESS)
     p.set_defaults(func=cmd_watch)
+
+    p = sub.add_parser("serve", help="τοπικός editor με ζωντανή προεπισκόπηση")
+    p.add_argument("project", nargs="?", default=".")
+    p.add_argument("--port", type=int, default=8420)
+    p.add_argument("--no-browser", action="store_true", help="μην ανοίξεις browser")
+    p.set_defaults(func=cmd_serve)
 
     p = sub.add_parser("validate", help="έλεγχος κειμένου, παραπομπών και εικόνων")
     p.add_argument("project", nargs="?", default=".")
