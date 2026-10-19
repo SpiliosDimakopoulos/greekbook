@@ -31,8 +31,42 @@ jobs:
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
 
+  standalone:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            asset: greekbook-windows.exe
+          - os: macos-latest
+            asset: greekbook-macos.zip
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install ".[docx]" pyinstaller
+      - run: python packaging/build_exe.py
+      - name: Smoke test
+        shell: bash
+        run: |
+          ./dist/greekbook --version
+          ./dist/greekbook doctor
+          ./dist/greekbook new smoke -t thesis && ./dist/greekbook build smoke --pdfa
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: mv dist/greekbook.exe "${{ matrix.asset }}"
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: cd dist && zip -9 "../${{ matrix.asset }}" greekbook
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.asset }}
+          path: ${{ matrix.asset }}
+
   github-release:
-    needs: build
+    needs: [build, standalone]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -49,11 +83,17 @@ jobs:
         with:
           name: dist
           path: dist/
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: greekbook-*
+          merge-multiple: true
+          path: standalone/
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
             dist/*
+            standalone/*
             greekbook-sample-thesis.pdf
             greekbook-sample-novel.pdf
             greekbook-sample-novel.epub

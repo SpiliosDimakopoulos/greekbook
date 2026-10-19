@@ -674,8 +674,9 @@ def run_app(
         server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(app, token, port_ref))
     port_ref[0] = server.server_address[1]
     url = f"http://127.0.0.1:{port_ref[0]}/"
-    print(f"\n  Το greekbook άνοιξε στον browser σου: {url}")
-    print("  Άφησε αυτό το παράθυρο ανοιχτό όσο γράφεις. Για έξοδο: Ctrl+C.\n")
+    print(f"\n  Το greekbook άνοιξε στον browser σου: {url}", flush=True)
+    print("  Άφησε αυτό το παράθυρο ανοιχτό όσο γράφεις.", flush=True)
+    print("  Για έξοδο: το κουμπί «Έξοδος» στην αρχική οθόνη ή Ctrl+C εδώ.\n", flush=True)
     if open_browser:
         threading.Timer(0.6, webbrowser.open, args=(url,)).start()
     thread = threading.Thread(target=server.serve_forever, daemon=True)

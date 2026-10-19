@@ -408,7 +408,7 @@ def interactive_menu() -> int:
 
 _ARGPARSE_GREEK = [
     (re.compile(r"invalid choice: '([^']*)' \(choose from (.*)\)"), "invalid"),
-    (re.compile(r"the following arguments are required: (.*)"), "Λείπει: {0}"),
+    (re.compile(r"the following arguments are required: (.*)"), "Λείπει το όρισμα: {0}"),
     (re.compile(r"unrecognized arguments: (.*)"), "Δεν αναγνωρίζω: {0}"),
     (re.compile(r"argument (\S+): expected one argument"), "Το {0} θέλει μια τιμή μετά."),
     (
@@ -421,7 +421,7 @@ _ARGPARSE_GREEK = [
 class _GreekFormatter(argparse.RawDescriptionHelpFormatter):
     def add_usage(self, usage: str | None, actions: Any, groups: Any, prefix: str | None = None
                   ) -> None:  # fmt: skip
-        super().add_usage(usage, actions, groups, prefix="Χρήση: ")
+        super().add_usage(usage, actions, groups, prefix="Χρήση: " if prefix is None else prefix)
 
 
 class GreekParser(argparse.ArgumentParser):
