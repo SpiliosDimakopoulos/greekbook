@@ -4,6 +4,28 @@ All notable changes are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased] — 0.3.0
+
+greekbook for people who have never opened a terminal.
+
+### Added
+- Standalone app for Windows and macOS: download, double-click, write.
+- `greekbook app`: home screen in the browser (new thesis/book/notes with a short
+  form, import from Word, recent projects, quit button).
+- Editor: settings form with template thumbnails instead of editing `book.yaml`,
+  labelled toolbar, image upload by button, drag & drop or paste, citation picker
+  from the bibliography, rename/reorder/delete chapters (deleted files go to `.kados`),
+  one-click fix for Latin look-alike letters, help sheet and a first-run tour,
+  PDF/EPUB download menu.
+- `greekbook` with no arguments opens a numbered menu; Greek help, «μήπως εννοείς…;»
+  suggestions for typos, a progress spinner and no tracebacks.
+- Plain-Greek explanations of common Typst errors (missing image, unknown reference,
+  unknown citation key).
+- New projects start with short guide pages instead of an empty folder.
+
+### Changed
+- An uncited bibliography is no longer printed as an empty «Βιβλιογραφία» page.
+
 ## [0.2.0] — 2026-10-19
 
 A rewrite on top of [Typst](https://typst.app).

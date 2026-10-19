@@ -33,6 +33,15 @@ $ greekbook build my-thesis --pdfa
 ✓ PDF: my-thesis/thesis.pdf  (0.4s)
 ```
 
+### Not a programmer?
+
+Download the app, double-click it, and write. No Python, no terminal, no installation:
+**[Windows](https://github.com/SpiliosDimakopoulos/greekbook/releases/latest/download/greekbook-windows.exe)**
+· **[macOS](https://github.com/SpiliosDimakopoulos/greekbook/releases/latest/download/greekbook-macos.zip)**
+· [step-by-step guide (Greek)](https://spiliosdimakopoulos.github.io/greekbook/gia-olous/)
+
+<img src="docs/images/app/editor.png" alt="The greekbook editor: chapters on the left, text in the middle, live pages on the right" width="100%">
+
 ## What you get
 
 - **Theses that pass the checklist.** University cover page, declaration of
@@ -79,8 +88,12 @@ my-thesis/
 └── references.bib
 ```
 
+Or just type `greekbook`: a numbered menu asks what you want to write and opens the app.
+
 | Command | What it does |
 |---|---|
+| `greekbook` | Menu: new thesis / book / notes, import from Word, open the app |
+| `greekbook app [DIR]` | The app in the browser: home screen, editor, settings form |
 | `greekbook new DIR -t thesis\|novel` | Start a project from a working example |
 | `greekbook build [DIR] [--epub] [--pdfa] [--open]` | Build the PDF (and EPUB) |
 | `greekbook serve [DIR]` | Local editor with live page preview |

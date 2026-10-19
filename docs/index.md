@@ -8,8 +8,8 @@ hide:
 **Γράφεις σε Markdown. Παίρνεις σωστά στοιχειοθετημένο ελληνικό βιβλίο ή πτυχιακή.**
 PDF, PDF/A και EPUB, χωρίς LaTeX και χωρίς μάχες με το Word.
 
-[Δοκίμασέ το στον browser](demo/){ .md-button .md-button--primary }
-[Εγκατάσταση](egkatastasi.md){ .md-button }
+[⬇ Κατέβασε την εφαρμογή](gia-olous.md){ .md-button .md-button--primary }
+[Δοκίμασέ το στον browser](demo/){ .md-button }
 
 ![Σελίδες δείγματος πτυχιακής: εξώφυλλο, κεφάλαια με εξισώσεις, σχήμα και πίνακα](images/thesis.png)
 
@@ -45,12 +45,18 @@ PDF, PDF/A και EPUB, χωρίς LaTeX και χωρίς μάχες με το 
 
 </div>
 
-## Σε τρεις εντολές
+## Δύο τρόποι να ξεκινήσεις
+
+**Χωρίς προγραμματισμό:** [κατέβασε την εφαρμογή](gia-olous.md) για Windows ή Mac και
+άνοιξέ τη με διπλό κλικ.
+
+![Ο editor του greekbook](images/app/editor.png)
+
+**Με Python:**
 
 ```console
 $ pip install greekbook
-$ greekbook new η-πτυχιακή-μου --template thesis
-$ greekbook serve η-πτυχιακή-μου
+$ greekbook
 ```
 
-Το τελευταίο ανοίγει editor στον browser: γράφεις αριστερά και βλέπεις τις σελίδες δεξιά.
+Το σκέτο `greekbook` ανοίγει ένα μενού με επιλογές, χωρίς εντολές για απομνημόνευση.

@@ -18,6 +18,17 @@ $ greekbook new η-πτυχιακή-μου --template thesis
 $ greekbook watch η-πτυχιακή-μου
 ```
 
+### Δεν προγραμματίζεις;
+
+Κατέβασε την εφαρμογή, άνοιξέ τη με διπλό κλικ και γράψε. Χωρίς Python, χωρίς τερματικό:
+**[Windows](https://github.com/SpiliosDimakopoulos/greekbook/releases/latest/download/greekbook-windows.exe)**
+· **[Mac](https://github.com/SpiliosDimakopoulos/greekbook/releases/latest/download/greekbook-macos.zip)**
+· [οδηγός βήμα-βήμα](https://spiliosdimakopoulos.github.io/greekbook/gia-olous/)
+
+<img src="docs/images/app/editor.png" alt="Ο editor του greekbook" width="100%">
+
+Με Python: `pip install greekbook` και μετά σκέτο `greekbook`, που ανοίγει μενού με επιλογές.
+
 ## Τι κάνει
 
 - **Πτυχιακές και διπλωματικές**: εξώφυλλο με ίδρυμα, τμήμα, επιβλέποντα και επιτροπή,

@@ -6,184 +6,512 @@
 <title>greekbook</title>
 <style>
 :root {
-  --bg: #f6f4f0; --panel: #ffffff; --ink: #1d1b18; --muted: #6f6a62; --line: #e3ded5;
-  --accent: #0b6e75; --accent-soft: #e2f1f1; --warn: #a15c00; --err: #b3261e; --page-bg: #d9d4cb;
-  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  --bg: #f6f4f0; --panel: #ffffff; --ink: #1d1b18; --muted: #6f6a62; --line: #e3ded5; --hover: #f1eee8;
+  --accent: #0b6e75; --accent-ink: #fff; --accent-soft: #e2f1f1; --warn: #9a5800; --err: #b3261e; --ok: #1e7b3a;
+  --page-bg: #dcd7ce; --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
   --sans: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #171614; --panel: #1f1e1b; --ink: #ece8e1; --muted: #a29c92; --line: #34312c;
-          --accent: #5cc1c7; --accent-soft: #1f3a3b; --warn: #f0b45c; --err: #ff8a80; --page-bg: #2a2825; }
+  :root { --bg: #171614; --panel: #201e1b; --ink: #ece8e1; --muted: #a29c92; --line: #36322d; --hover: #2a2723;
+          --accent: #5cc1c7; --accent-ink: #0d1b1c; --accent-soft: #1f3a3b; --warn: #f0b45c; --err: #ff8a80; --ok: #7fd49a;
+          --page-bg: #2b2925; }
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans);
-       display: grid; grid-template-rows: auto 1fr; }
-header { display: flex; align-items: center; gap: 12px; padding: 8px 14px;
-         border-bottom: 1px solid var(--line); background: var(--panel); }
-header h1 { font-size: 15px; margin: 0; font-weight: 650; }
-header .title { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-header .spacer { flex: 1; }
-.pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
-.pill.err { background: color-mix(in srgb, var(--err) 15%, transparent); color: var(--err); }
-button, .btn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-               padding: 5px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); display: grid; grid-template-rows: auto 1fr; }
+button, .btn, select { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+                       padding: 6px 12px; border-radius: 8px; cursor: pointer; text-decoration: none; }
 button:hover, .btn:hover { border-color: var(--accent); color: var(--accent); }
-main { display: grid; grid-template-columns: 220px minmax(320px, 1fr) minmax(320px, 1fr); min-height: 0; }
-nav { border-right: 1px solid var(--line); overflow: auto; padding: 10px 6px; background: var(--panel); }
-nav h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 14px 8px 4px; }
-nav a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-nav a.active { background: var(--accent-soft); color: var(--accent); }
-nav button { margin: 12px 8px; width: calc(100% - 16px); }
-.editor { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; border-right: 1px solid var(--line); }
-.toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-.toolbar button { padding: 3px 8px; font-size: 13px; }
-textarea { width: 100%; height: 100%; resize: none; border: 0; outline: none; padding: 18px 22px;
-           background: var(--panel); color: var(--ink); font: 15px/1.7 var(--mono); tab-size: 4; }
-.issues { max-height: 30%; overflow: auto; border-top: 1px solid var(--line); background: var(--panel); font-size: 13px; }
-.issues div { padding: 4px 12px; cursor: pointer; border-bottom: 1px solid var(--line); }
-.issues div:hover { background: var(--accent-soft); }
-.issues .error { color: var(--err); } .issues .warning { color: var(--warn); }
-.preview { overflow: auto; background: var(--page-bg); padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+button.primary:hover { color: var(--accent-ink); filter: brightness(1.08); }
+button.ghost { border-color: transparent; background: transparent; }
+
+/* header */
+header { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
+header .title { font-weight: 650; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 40vw; }
+.spacer { flex: 1; }
+.status { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.status.busy .dot { background: var(--warn); animation: pulse 1s infinite; }
+.status.err .dot { background: var(--err); }
+@keyframes pulse { 50% { opacity: .3; } }
+.menu { position: relative; }
+.menu-list { display: none; position: absolute; right: 0; top: 110%; background: var(--panel); border: 1px solid var(--line);
+             border-radius: 10px; padding: 6px; min-width: 230px; z-index: 20; box-shadow: 0 8px 30px rgba(0,0,0,.15); }
+.menu.open .menu-list { display: block; }
+.menu-list a { display: block; padding: 8px 10px; border-radius: 6px; color: var(--ink); text-decoration: none; }
+.menu-list a:hover { background: var(--hover); }
+.menu-list small { display: block; color: var(--muted); }
+
+/* layout */
+main { display: grid; grid-template-columns: 240px minmax(340px, 1fr) minmax(340px, 1fr); min-height: 0; }
+nav { border-right: 1px solid var(--line); overflow: auto; padding: 8px 8px 20px; background: var(--panel); }
+nav h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 16px 8px 4px; }
+.item { display: flex; align-items: center; border-radius: 8px; }
+.item a { flex: 1; padding: 6px 8px; color: var(--ink); text-decoration: none; cursor: pointer; overflow: hidden;
+          text-overflow: ellipsis; white-space: nowrap; }
+.item.active { background: var(--accent-soft); }
+.item.active a { color: var(--accent); font-weight: 600; }
+.item:hover { background: var(--hover); }
+.item .tools { display: none; }
+.item:hover .tools, .item.active .tools { display: flex; }
+.tools button { border: 0; background: transparent; padding: 3px 5px; color: var(--muted); font-size: 13px; }
+.tools button:hover { color: var(--accent); }
+.add { display: block; width: calc(100% - 8px); margin: 6px 4px; text-align: left; color: var(--accent); border-style: dashed; }
+
+.editor { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; border-right: 1px solid var(--line); }
+.toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--line); flex-wrap: wrap; background: var(--panel); }
+.toolbar button { padding: 4px 9px; font-size: 13px; display: inline-flex; gap: 5px; align-items: center; }
+.toolbar .sep { width: 1px; background: var(--line); margin: 2px 4px; }
+.toolbar .ico { font-weight: 700; }
+textarea { width: 100%; height: 100%; resize: none; border: 0; outline: none; padding: 22px 28px; background: var(--panel);
+           color: var(--ink); font: 16px/1.75 var(--sans); tab-size: 4; }
+textarea.mono { font: 15px/1.7 var(--mono); }
+.drop textarea { outline: 3px dashed var(--accent); outline-offset: -10px; }
+.problems { border-top: 1px solid var(--line); background: var(--panel); max-height: 30vh; overflow: auto; }
+.problems summary { padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.problem { display: flex; gap: 10px; align-items: flex-start; padding: 7px 14px; border-top: 1px solid var(--line); font-size: 13px; }
+.problem .where { color: var(--muted); white-space: nowrap; cursor: pointer; text-decoration: underline dotted; }
+.problem.error .icon { color: var(--err); } .problem.warning .icon { color: var(--warn); }
+.problem .msg { flex: 1; }
+.problem button { padding: 2px 8px; font-size: 12px; }
+
+.preview { overflow: auto; background: var(--page-bg); padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; }
 .preview img { width: min(100%, var(--zoom, 560px)); background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
-.preview .error-box { background: var(--panel); color: var(--err); padding: 14px; border-radius: 8px; white-space: pre-wrap; font: 13px var(--mono); max-width: 560px; }
-.zoom { display: flex; gap: 4px; }
-@media (max-width: 900px) { main { grid-template-columns: 1fr; } nav, .preview { display: none; } }
+.zoombar { position: sticky; top: 0; align-self: flex-end; display: flex; gap: 4px; z-index: 2; }
+.zoombar button { padding: 2px 10px; background: var(--panel); }
+.message { background: var(--panel); padding: 16px 18px; border-radius: 10px; max-width: 560px; }
+.message.err { border-left: 4px solid var(--err); }
+.message b { display: block; margin-bottom: 4px; }
+
+/* dialogs */
+dialog { border: 0; border-radius: 16px; padding: 0; width: min(720px, 95vw); max-height: 90vh; background: var(--panel);
+         color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(20,18,15,.45); }
+.dlg { padding: 22px 26px; overflow: auto; max-height: 90vh; }
+.dlg h3 { margin: 0 0 4px; font-size: 21px; }
+.dlg .sub { color: var(--muted); margin: 0 0 14px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 10px 0 6px; flex-wrap: wrap; }
+.tabs button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; padding: 8px 12px; }
+.tabs button.on { border-bottom-color: var(--accent); color: var(--accent); font-weight: 600; }
+.tab { display: none; } .tab.on { display: block; }
+label { display: block; font-weight: 600; font-size: 13px; margin: 12px 0 4px; }
+label small, .hint { font-weight: 400; color: var(--muted); font-size: 12.5px; }
+input[type=text], .dlg select, .dlg textarea { width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border-radius: 8px;
+     border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.dlg textarea { min-height: 70px; resize: vertical; font-family: var(--sans); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 400; font-size: 14px; }
+.templates { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.tpl { border: 2px solid var(--line); border-radius: 10px; padding: 6px; cursor: pointer; background: var(--bg); text-align: left; }
+.tpl.on { border-color: var(--accent); }
+.tpl img { width: 100%; border-radius: 6px; display: block; }
+.tpl b { display: block; font-size: 13px; margin: 6px 2px 0; }
+.tpl span { font-size: 12px; color: var(--muted); margin: 0 2px; }
+.actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; align-items: center; }
+.actions .err { color: var(--err); flex: 1; }
+table.help { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.help td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.help td:last-child { font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
+.cites { max-height: 320px; overflow: auto; margin-top: 10px; }
+.cite { display: block; width: 100%; text-align: left; margin: 4px 0; }
+.cite small { display: block; color: var(--muted); }
+.welcome ol { padding-left: 20px; } .welcome li { margin: 8px 0; }
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg);
+         padding: 9px 16px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 30; }
+.toast.on { opacity: .95; }
+@media (max-width: 1050px) { main { grid-template-columns: 200px 1fr; } .preview { display: none; } .toolbar .lbl { display: none; } }
+@media (max-width: 680px) { main { grid-template-columns: 1fr; } nav { display: none; } }
 </style>
 </head>
 <body>
 <header>
-  <h1>greekbook</h1><span class="title" id="book-title"></span>
+  <button class="ghost" id="home" title="Πίσω στις εργασίες σου">← Εργασίες</button>
+  <span class="title" id="book-title"></span>
   <span class="spacer"></span>
-  <span class="pill" id="status">…</span>
-  <span class="zoom"><button id="zoom-out" title="Σμίκρυνση">−</button><button id="zoom-in" title="Μεγέθυνση">+</button></span>
-  <a class="btn" href="/book.pdf" target="_blank" rel="noopener">PDF</a>
+  <span class="status" id="status"><span class="dot"></span><span id="status-text">Φόρτωση…</span></span>
+  <button id="settings-btn">⚙ Ρυθμίσεις</button>
+  <button id="help-btn">? Βοήθεια</button>
+  <div class="menu" id="download-menu">
+    <button class="primary" id="download-btn">⬇ Λήψη ▾</button>
+    <div class="menu-list">
+      <a href="/book.pdf?download=1">PDF<small>για εκτύπωση, αποστολή, υποβολή</small></a>
+      <a href="/book.pdf" target="_blank" rel="noopener">Άνοιγμα PDF σε νέα καρτέλα<small>για να το δεις ολόκληρο</small></a>
+      <a href="/book.epub?download=1">EPUB<small>για Kindle, Kobo και κινητά</small></a>
+    </div>
+  </div>
 </header>
 <main>
-  <nav id="files"></nav>
-  <section class="editor">
-    <div class="toolbar">
-      <button data-wrap="**" title="Έντονα (Ctrl+B)"><b>B</b></button>
-      <button data-wrap="*" title="Πλάγια (Ctrl+I)"><i>I</i></button>
-      <button data-insert="^[υποσημείωση]" title="Υποσημείωση">¹</button>
-      <button data-insert="[@κλειδί]" title="Παραπομπή">[@]</button>
-      <button data-insert="&#10;&#10;![Λεζάντα](figures/εικόνα.png){#fig:x width=70%}&#10;&#10;" title="Εικόνα">Εικόνα</button>
-      <button data-insert="&#10;&#10;| Α | Β |&#10;|---|---|&#10;| 1 | 2 |&#10;&#10;Table: Λεζάντα {#tbl:x}&#10;&#10;" title="Πίνακας">Πίνακας</button>
-      <button data-insert="&#10;&#10;$$ x^2 $$ (eq:x)&#10;&#10;" title="Εξίσωση">Εξίσωση</button>
-      <button data-insert="&#10;&#10;---&#10;&#10;" title="Αλλαγή σκηνής">⁂</button>
+  <nav id="files" aria-label="Κεφάλαια"></nav>
+  <section class="editor" id="editor-pane">
+    <div class="toolbar" role="toolbar" aria-label="Μορφοποίηση">
+      <button data-act="heading" title="Νέα ενότητα"><span class="ico">Τ</span><span class="lbl">Επικεφαλίδα</span></button>
+      <button data-act="bold" title="Έντονα (Ctrl+B)"><span class="ico">B</span></button>
+      <button data-act="italic" title="Πλάγια (Ctrl+I)"><span class="ico"><i>I</i></span></button>
+      <button data-act="list" title="Λίστα με κουκκίδες"><span class="ico">•</span><span class="lbl">Λίστα</span></button>
+      <button data-act="numbered" title="Αριθμημένη λίστα"><span class="ico">1.</span><span class="lbl">Αρίθμηση</span></button>
+      <span class="sep"></span>
+      <button data-act="image" title="Εικόνα (ή σύρε/επικόλλησε μια εικόνα στο κείμενο)"><span class="ico">🖼</span><span class="lbl">Εικόνα</span></button>
+      <button data-act="table" title="Πίνακας"><span class="ico">▦</span><span class="lbl">Πίνακας</span></button>
+      <button data-act="footnote" title="Υποσημείωση"><span class="ico">¹</span><span class="lbl">Υποσημείωση</span></button>
+      <button data-act="cite" title="Παραπομπή σε πηγή της βιβλιογραφίας"><span class="ico">❝</span><span class="lbl">Παραπομπή</span></button>
+      <button data-act="math" title="Εξίσωση"><span class="ico">∑</span><span class="lbl">Εξίσωση</span></button>
+      <span class="sep"></span>
+      <button data-act="scene" title="Αλλαγή σκηνής ⁂"><span class="ico">⁂</span></button>
+      <button data-act="page" title="Αλλαγή σελίδας"><span class="ico">⤓</span></button>
     </div>
-    <textarea id="text" spellcheck="true" lang="el" disabled></textarea>
-    <div class="issues" id="issues"></div>
+    <textarea id="text" spellcheck="true" lang="el" disabled aria-label="Κείμενο"></textarea>
+    <details class="problems" id="problems" open><summary id="problems-title">Έλεγχος κειμένου</summary><div id="problem-list"></div></details>
   </section>
-  <section class="preview" id="preview"></section>
+  <section class="preview" id="preview" aria-label="Προεπισκόπηση σελίδων">
+    <div class="zoombar"><button id="zoom-out" title="Μικρότερο">−</button><button id="zoom-in" title="Μεγαλύτερο">+</button></div>
+  </section>
 </main>
+<input type="file" id="image-input" accept="image/*" hidden>
+<input type="file" id="logo-input" accept="image/*" hidden>
+<div class="toast" id="toast"></div>
+
+<dialog id="settings"><div class="dlg">
+  <h3>Ρυθμίσεις</h3>
+  <p class="sub">Οι αλλαγές φαίνονται στις σελίδες αμέσως μόλις πατήσεις «Αποθήκευση».</p>
+  <div class="tabs" id="tabs">
+    <button data-tab="basic" class="on">Βασικά</button>
+    <button data-tab="look">Εμφάνιση</button>
+    <button data-tab="thesis" id="tab-thesis">Πτυχιακή</button>
+    <button data-tab="book" id="tab-book">Βιβλίο</button>
+    <button data-tab="content">Περιεχόμενο</button>
+  </div>
+  <div class="tab on" data-tab="basic">
+    <label>Τίτλος</label><input type="text" data-key="title">
+    <label>Υπότιτλος <small>(προαιρετικό)</small></label><input type="text" data-key="subtitle">
+    <label>Συγγραφέας</label><input type="text" data-key="author">
+    <label>Γλώσσα κειμένου</label>
+    <select data-key="language"><option value="el">Ελληνικά</option><option value="en">Αγγλικά</option></select>
+  </div>
+  <div class="tab" data-tab="look">
+    <label>Πρότυπο</label><div class="templates" id="templates"></div>
+    <div class="grid2">
+      <div><label>Μέγεθος σελίδας</label>
+        <select data-key="page_size"><option value="">Αυτόματο</option><option>A4</option><option>A5</option>
+          <option>B5</option><option value="6x9in">6×9 ίντσες (βιβλίο)</option><option value="LETTER">Letter (ΗΠΑ)</option></select></div>
+      <div><label>Αρίθμηση κεφαλαίων</label>
+        <select data-key="chapter_numbering"><option value="auto">Αυτόματη</option><option value="greek">Α΄, Β΄, Γ΄</option>
+          <option value="arabic">1, 2, 3</option><option value="roman">I, II, III</option><option value="words">Πρώτο, Δεύτερο</option>
+          <option value="none">Χωρίς αρίθμηση</option></select></div>
+      <div><label>Γραμματοσειρά <small>(κενό: του προτύπου)</small></label><input type="text" data-key="font" placeholder="π.χ. Liberation Serif"></div>
+      <div><label>Μέγεθος γραμμάτων <small>(κενό: του προτύπου)</small></label><input type="text" data-key="font_size" placeholder="π.χ. 12pt"></div>
+    </div>
+  </div>
+  <div class="tab" data-tab="thesis">
+    <label>Είδος εργασίας</label>
+    <select data-key="thesis.type"><option>Πτυχιακή Εργασία</option><option>Διπλωματική Εργασία</option>
+      <option>Μεταπτυχιακή Διπλωματική Εργασία</option><option>Διδακτορική Διατριβή</option></select>
+    <div class="grid2">
+      <div><label>Πανεπιστήμιο</label><input type="text" data-key="thesis.institution"></div>
+      <div><label>Σχολή</label><input type="text" data-key="thesis.school"></div>
+      <div><label>Τμήμα</label><input type="text" data-key="thesis.department"></div>
+      <div><label>Πρόγραμμα σπουδών <small>(π.χ. ΠΜΣ)</small></label><input type="text" data-key="thesis.program"></div>
+      <div><label>Αριθμός μητρώου</label><input type="text" data-key="thesis.student_id"></div>
+      <div><label>Επιβλέπων/ουσα</label><input type="text" data-key="thesis.supervisor"></div>
+      <div><label>Τόπος</label><input type="text" data-key="thesis.place" placeholder="π.χ. Αθήνα"></div>
+      <div><label>Ημερομηνία</label><input type="text" data-key="thesis.date" placeholder="π.χ. Ιούνιος 2026"></div>
+    </div>
+    <label>Εξεταστική επιτροπή <small>(ένα όνομα ανά γραμμή)</small></label><textarea data-key="thesis.committee" data-list="1"></textarea>
+    <label>Λογότυπο πανεπιστημίου</label>
+    <div class="check"><input type="text" data-key="thesis.logo" placeholder="καμία εικόνα" readonly><button type="button" id="logo-btn">Επιλογή…</button></div>
+    <label class="check"><input type="checkbox" data-key="thesis.declaration" data-default="true"> Σελίδα «Δήλωση πρωτοτυπίας»</label>
+  </div>
+  <div class="tab" data-tab="book">
+    <div class="grid2">
+      <div><label>Εκδότης</label><input type="text" data-key="publisher"></div>
+      <div><label>Έτος</label><input type="text" data-key="year"></div>
+    </div>
+    <label>Copyright <small>(σελίδα πνευματικών δικαιωμάτων)</small></label><input type="text" data-key="copyright" placeholder="© 2026 Όνομα Επώνυμο">
+    <label>Αφιέρωση</label><input type="text" data-key="dedication" placeholder="Στη μητέρα μου">
+    <label>Μότο</label><textarea data-key="epigraph"></textarea>
+  </div>
+  <div class="tab" data-tab="content">
+    <label class="check"><input type="checkbox" data-key="toc"> Πίνακας περιεχομένων</label>
+    <label class="check"><input type="checkbox" data-key="list_of_figures"> Κατάλογος σχημάτων</label>
+    <label class="check"><input type="checkbox" data-key="list_of_tables"> Κατάλογος πινάκων</label>
+    <label class="check"><input type="checkbox" data-key="pdf_standard" data-on="a-2b" data-off="1.7"> PDF/A (ζητείται από τα ιδρυματικά αποθετήρια)</label>
+    <label>Στυλ βιβλιογραφίας</label>
+    <select data-key="citation_style"><option value="apa">APA (Συγγραφέας, έτος)</option><option value="ieee">IEEE [1]</option>
+      <option value="harvard">Harvard</option><option value="chicago">Chicago</option><option value="mla">MLA</option>
+      <option value="vancouver">Vancouver</option></select>
+    <p class="hint">Για προχωρημένους: όλες οι ρυθμίσεις βρίσκονται και στο αρχείο <a href="#" id="raw-yaml">book.yaml</a>.</p>
+  </div>
+  <div class="actions"><span class="err" id="settings-error" role="alert"></span>
+    <button id="settings-cancel">Άκυρο</button><button class="primary" id="settings-save">Αποθήκευση</button></div>
+</div></dialog>
+
+<dialog id="help"><div class="dlg">
+  <h3>Πώς γράφω;</h3>
+  <p class="sub">Γράφεις απλό κείμενο. Τα κουμπιά πάνω από το κείμενο κάνουν τα υπόλοιπα· αυτός είναι ο κρυφός κώδικας που βάζουν.</p>
+  <table class="help">
+    <tr><td>Νέα παράγραφος</td><td>(μία κενή γραμμή)</td></tr>
+    <tr><td>Νέο κεφάλαιο</td><td>κουμπί «+ Νέο κεφάλαιο» αριστερά</td></tr>
+    <tr><td>Ενότητα / υποενότητα</td><td>## Τίτλος ενότητας
+### Υποενότητα</td></tr>
+    <tr><td><b>Έντονα</b> / <i>πλάγια</i></td><td>**έντονα**   *πλάγια*</td></tr>
+    <tr><td>«Εισαγωγικά»</td><td>"κείμενο"  → γίνεται «κείμενο» μόνο του</td></tr>
+    <tr><td>Παύλα διαλόγου —</td><td>---</td></tr>
+    <tr><td>Λίστα</td><td>- πρώτο
+- δεύτερο</td></tr>
+    <tr><td>Εικόνα</td><td>κουμπί «Εικόνα», ή σύρε την εικόνα μέσα στο κείμενο</td></tr>
+    <tr><td>Υποσημείωση</td><td>κείμενο^[η σημείωση]</td></tr>
+    <tr><td>Παραπομπή σε πηγή</td><td>[@κλειδί]   ή   [@κλειδί, σ. 12]</td></tr>
+    <tr><td>Αναφορά σε σχήμα/πίνακα</td><td>@fig:xartis   ή   στον Πίνακα [-@tbl:apotelesmata]</td></tr>
+    <tr><td>Εξίσωση</td><td>$$ E = mc^2 $$</td></tr>
+    <tr><td>Αλλαγή σκηνής ⁂</td><td>---  (ανάμεσα σε δύο παραγράφους)</td></tr>
+  </table>
+  <p class="hint" style="margin-top:14px">Συντομεύσεις: Ctrl+B έντονα · Ctrl+I πλάγια · Ctrl+S αποθήκευση (γίνεται και μόνη της).
+    Αναλυτικός οδηγός: <a href="https://spiliosdimakopoulos.github.io/greekbook/" target="_blank" rel="noopener">τεκμηρίωση</a>.</p>
+  <div class="actions"><button id="tour-btn">Ξανά η γρήγορη ξενάγηση</button><button class="primary" id="help-close">Εντάξει</button></div>
+</div></dialog>
+
+<dialog id="cite"><div class="dlg">
+  <h3>Παραπομπή σε πηγή</h3>
+  <input type="text" id="cite-search" placeholder="Αναζήτηση συγγραφέα ή τίτλου…">
+  <div class="cites" id="cite-list"></div>
+  <div class="actions"><button id="cite-close">Κλείσιμο</button></div>
+</div></dialog>
+
+<dialog id="welcome"><div class="dlg welcome">
+  <h3>Καλώς ήρθες! 👋</h3>
+  <ol>
+    <li><b>Αριστερά</b> είναι τα κεφάλαιά σου. Πάτα ένα για να το ανοίξεις ή «+ Νέο κεφάλαιο».</li>
+    <li><b>Στη μέση</b> γράφεις. Όλα αποθηκεύονται μόνα τους.</li>
+    <li><b>Δεξιά</b> βλέπεις τις σελίδες όπως θα τυπωθούν, σε ένα δευτερόλεπτο.</li>
+    <li>Από <b>«Ρυθμίσεις»</b> αλλάζεις τίτλο, εμφάνιση και τα στοιχεία του εξωφύλλου.</li>
+    <li>Όταν τελειώσεις: <b>«Λήψη» → PDF</b>.</li>
+  </ol>
+  <p class="hint">Κάτω από το κείμενο ο «Έλεγχος κειμένου» δείχνει λάθη που δεν φαίνονται με το μάτι, π.χ. λατινικό «o» μέσα σε ελληνική λέξη.</p>
+  <div class="actions"><button class="primary" id="welcome-ok">Ξεκινάμε</button></div>
+</div></dialog>
+
 <script>
 const TOKEN = "__TOKEN__";
-const GROUPS = {settings: "Ρυθμίσεις", front: "Αρχικές σελίδες", chapters: "Κεφάλαια",
-                appendices: "Παραρτήματα", bibliography: "Βιβλιογραφία"};
+const GROUPS = {front: "Αρχικές σελίδες", chapters: "Κεφάλαια", appendices: "Παραρτήματα", bibliography: "Βιβλιογραφία", settings: "Ρυθμίσεις"};
+const TEMPLATES = {
+  thesis: ["Πτυχιακή", "εξώφυλλο, A4, διάστιχο 1,5"], academic: ["Σημειώσεις / άρθρο", "Computer Modern"],
+  novel: ["Βιβλίο", "λογοτεχνία, κεφάλαια Α΄ Β΄"], classic: ["Κλασικό βιβλίο", "«Κεφάλαιο Πρώτο»"],
+  sepia: ["Βιβλίο sepia", "για ανάγνωση στην οθόνη"], clean: ["Οδηγός", "μοντέρνο, χωρίς πατούρες"],
+};
+const DEFAULTS = {language: "el", chapter_numbering: "auto", pdf_standard: "1.7", citation_style: "apa",
+                  "thesis.type": "Πτυχιακή Εργασία", "thesis.declaration": true};
+const LOOKALIKE = {A:"Α",B:"Β",E:"Ε",H:"Η",I:"Ι",K:"Κ",M:"Μ",N:"Ν",O:"Ο",P:"Ρ",T:"Τ",X:"Χ",Y:"Υ",Z:"Ζ",o:"ο",u:"υ",v:"ν",i:"ι",k:"κ",x:"χ"};
 const $ = (id) => document.getElementById(id);
-let current = null, saveTimer = null, version = -1, dirty = false, zoom = 560;
+let current = null, saveTimer = null, version = -1, dirty = false, zoom = 560, config = {}, chosenTemplate = null;
 
 async function api(path, opts = {}) {
   opts.headers = {...(opts.headers || {}), "X-Greekbook-Token": TOKEN};
   const res = await fetch(path, opts);
-  if (!res.ok) throw new Error(await res.text());
-  return res;
+  const type = res.headers.get("Content-Type") || "";
+  const data = type.includes("json") ? await res.json() : await res.text();
+  if (!res.ok || (data && data.error)) throw new Error((data && data.error) || "Κάτι πήγε στραβά.");
+  return data;
 }
+const post = (path, body) => api(path, {method: "POST", body: JSON.stringify(body)});
+function toast(text) { const t = $("toast"); t.textContent = text; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2200); }
+function setStatus(text, kind = "") { $("status-text").textContent = text; $("status").className = "status " + kind; }
 
+// ---------------------------------------------------------------- files
 async function loadFiles(select) {
-  const files = await (await api("/api/files")).json();
+  const files = await api("/api/files");
   const nav = $("files");
   nav.textContent = "";
-  let group = null;
-  for (const f of files) {
-    if (f.group !== group) {
-      group = f.group;
-      const h = document.createElement("h2");
-      h.textContent = GROUPS[group] || group;
-      nav.append(h);
-    }
-    const a = document.createElement("a");
-    a.textContent = f.path.split("/").pop();
-    a.title = f.path;
-    a.dataset.path = f.path;
-    a.onclick = () => openFile(f.path);
-    nav.append(a);
+  const byGroup = {};
+  for (const f of files) (byGroup[f.group] ||= []).push(f);
+  const isThesis = config.template === "thesis";
+  for (const group of ["front", "chapters", "appendices", "bibliography", "settings"]) {
+    const list = byGroup[group] || [];
+    if (!list.length && !(group === "chapters" || (isThesis && (group === "front" || group === "appendices")))) continue;
+    const h = document.createElement("h2");
+    h.textContent = GROUPS[group];
+    nav.append(h);
+    list.forEach((f, i) => nav.append(fileItem(f, i, list.length)));
+    if (group === "chapters") nav.append(addButton("+ Νέο κεφάλαιο", "chapters"));
+    if (isThesis && group === "front") nav.append(addButton("+ Αρχική σελίδα", "front"));
+    if (isThesis && group === "appendices") nav.append(addButton("+ Παράρτημα", "appendices"));
   }
-  const add = document.createElement("button");
-  add.textContent = "+ Νέο κεφάλαιο";
-  add.onclick = newChapter;
-  nav.append(add);
-  const target = select || current || (files.find(f => f.group === "chapters") || files[0]).path;
-  await openFile(target);
+  const target = select || current || (byGroup.chapters || files)[0]?.path;
+  if (target) await openFile(target);
+}
+
+function fileItem(f, index, count) {
+  const row = document.createElement("div");
+  row.className = "item";
+  row.dataset.path = f.path;
+  const a = document.createElement("a");
+  a.textContent = f.title;
+  a.title = f.path;
+  a.onclick = () => openFile(f.path);
+  row.append(a);
+  if (f.path.endsWith(".md")) {
+    const tools = document.createElement("span");
+    tools.className = "tools";
+    const btn = (label, title, fn, enabled = true) => {
+      const b = document.createElement("button"); b.textContent = label; b.title = title; b.onclick = fn;
+      if (!enabled) b.style.visibility = "hidden"; tools.append(b);
+    };
+    btn("↑", "Μετακίνηση πάνω", () => move(f.path, "up"), index > 0);
+    btn("↓", "Μετακίνηση κάτω", () => move(f.path, "down"), index < count - 1);
+    btn("✎", "Μετονομασία", () => rename(f));
+    btn("🗑", "Διαγραφή", () => remove(f));
+    row.append(tools);
+  }
+  return row;
+}
+function addButton(label, group) {
+  const b = document.createElement("button");
+  b.className = "add"; b.textContent = label;
+  b.onclick = async () => {
+    const title = prompt(group === "front" ? "Τίτλος (π.χ. Ευχαριστίες, Πρόλογος):" : group === "appendices" ? "Τίτλος παραρτήματος:" : "Τίτλος του νέου κεφαλαίου:");
+    if (!title) return;
+    try { const {path} = await post("/api/chapter", {title, group}); await loadFiles(path); toast("Δημιουργήθηκε"); }
+    catch (e) { alert(e.message); }
+  };
+  return b;
+}
+async function move(path, direction) { await flush(); try { await post("/api/chapter/move", {path, direction}); current = null; await loadFiles(); } catch (e) { alert(e.message); } }
+async function rename(f) {
+  const title = prompt("Νέος τίτλος:", f.title);
+  if (!title || title === f.title) return;
+  await flush();
+  try { const {path} = await post("/api/chapter/rename", {path: f.path, title}); current = path; await loadFiles(path); }
+  catch (e) { alert(e.message); }
+}
+async function remove(f) {
+  if (!confirm(`Διαγραφή του «${f.title}»;\n\nΔεν χάνεται οριστικά: μεταφέρεται στον φάκελο «.kados» της εργασίας.`)) return;
+  try { await post("/api/chapter/delete", {path: f.path}); if (current === f.path) current = null; await loadFiles(); toast("Διαγράφηκε"); }
+  catch (e) { alert(e.message); }
 }
 
 async function openFile(path) {
-  if (dirty) await save();
-  const text = await (await api("/api/file?path=" + encodeURIComponent(path))).text();
+  await flush();
+  const text = await api("/api/file?path=" + encodeURIComponent(path));
   current = path;
   const ta = $("text");
   ta.value = text;
   ta.disabled = false;
+  ta.classList.toggle("mono", !path.endsWith(".md"));
   ta.setSelectionRange(0, 0);
-  ta.focus();
   ta.scrollTop = 0;
-  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("active", a.dataset.path === path));
+  ta.focus();
+  document.querySelectorAll(".item").forEach(el => el.classList.toggle("active", el.dataset.path === path));
 }
 
-async function save() {
-  if (!current) return;
+async function flush() {
+  if (!dirty || !current) return;
   clearTimeout(saveTimer);
   dirty = false;
-  await api("/api/file?path=" + encodeURIComponent(current), {method: "PUT", body: $("text").value});
-  setStatus("Δημιουργία…");
-  if (current === "book.yaml") loadFiles(current);
+  setStatus("Αποθήκευση…", "busy");
+  try { await api("/api/file?path=" + encodeURIComponent(current), {method: "PUT", body: $("text").value}); }
+  catch (e) { dirty = true; setStatus("Δεν αποθηκεύτηκε: " + e.message, "err"); }
 }
 
-async function newChapter() {
-  const title = prompt("Τίτλος νέου κεφαλαίου:");
-  if (!title) return;
-  const res = await api("/api/chapter", {method: "POST", body: JSON.stringify({title})});
-  const {path} = await res.json();
-  await loadFiles(path);
+// ---------------------------------------------------------------- editing helpers
+function insert(before, after = "", placeholder = "") {
+  const ta = $("text");
+  const [s, e] = [ta.selectionStart, ta.selectionEnd];
+  const selected = ta.value.slice(s, e) || placeholder;
+  ta.setRangeText(before + selected + after, s, e, "end");
+  if (placeholder && s === e) ta.setSelectionRange(s + before.length, s + before.length + selected.length);
+  ta.dispatchEvent(new Event("input"));
+  ta.focus();
 }
-
-function setStatus(text, error = false) {
-  const s = $("status");
-  s.textContent = text;
-  s.classList.toggle("err", error);
+function insertBlock(text) {
+  const ta = $("text");
+  const s = ta.selectionStart;
+  const pre = ta.value.slice(0, s);
+  const lead = pre === "" || pre.endsWith("\n\n") ? "" : pre.endsWith("\n") ? "\n" : "\n\n";
+  ta.setRangeText(lead + text + "\n\n", s, ta.selectionEnd, "end");
+  ta.dispatchEvent(new Event("input"));
+  ta.focus();
 }
+const ACTIONS = {
+  heading: () => insertBlock("## Νέα ενότητα"),
+  bold: () => insert("**", "**", "κείμενο"),
+  italic: () => insert("*", "*", "κείμενο"),
+  list: () => insertBlock("- πρώτο\n- δεύτερο\n- τρίτο"),
+  numbered: () => insertBlock("1. πρώτο\n2. δεύτερο\n3. τρίτο"),
+  image: () => $("image-input").click(),
+  table: () => insertBlock("| Στήλη Α | Στήλη Β |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n\nTable: Η λεζάντα του πίνακα. {#tbl:pinakas}"),
+  footnote: () => insert("^[", "]", "η υποσημείωση"),
+  cite: openCite,
+  math: () => insertBlock("$$ E = mc^2 $$"),
+  scene: () => insertBlock("---"),
+  page: () => insertBlock("\\newpage"),
+};
+document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => { if (current?.endsWith(".md") || b.dataset.act === "image") ACTIONS[b.dataset.act](); else toast("Άνοιξε πρώτα ένα κεφάλαιο"); });
 
+async function uploadImage(file) {
+  if (!file || !current) return;
+  setStatus("Ανέβασμα εικόνας…", "busy");
+  try {
+    const {markdown} = await api("/api/image?for=" + encodeURIComponent(current),
+      {method: "POST", body: await file.arrayBuffer(), headers: {"X-Filename": encodeURIComponent(file.name || "eikona.png")}});
+    insertBlock(markdown);
+    toast("Η εικόνα μπήκε. Άλλαξε τη λεζάντα μέσα στα [ ].");
+  } catch (e) { alert(e.message); }
+}
+$("image-input").onchange = () => { uploadImage($("image-input").files[0]); $("image-input").value = ""; };
+const pane = $("editor-pane");
+pane.addEventListener("dragover", (e) => { if ([...e.dataTransfer.items].some(i => i.type.startsWith("image/"))) { e.preventDefault(); pane.classList.add("drop"); } });
+pane.addEventListener("dragleave", () => pane.classList.remove("drop"));
+pane.addEventListener("drop", (e) => { pane.classList.remove("drop"); const f = [...e.dataTransfer.files].find(f => f.type.startsWith("image/")); if (f) { e.preventDefault(); uploadImage(f); } });
+$("text").addEventListener("paste", (e) => { const f = [...e.clipboardData.files].find(f => f.type.startsWith("image/")); if (f) { e.preventDefault(); uploadImage(f); } });
+
+async function openCite() {
+  const entries = await api("/api/bib");
+  const list = $("cite-list");
+  const render = (q) => {
+    list.textContent = "";
+    const shown = entries.filter(e => (e.key + e.title + e.author).toLowerCase().includes(q.toLowerCase()));
+    if (!entries.length) list.innerHTML = '<p class="hint">Δεν υπάρχουν πηγές ακόμα. Πρόσθεσέ τες στο αρχείο «Βιβλιογραφία» αριστερά (μπορείς να τις εξαγάγεις από Zotero ως BibTeX).</p>';
+    for (const e of shown) {
+      const b = document.createElement("button");
+      b.className = "cite";
+      b.innerHTML = "<b></b><small></small>";
+      b.querySelector("b").textContent = e.title || e.key;
+      b.querySelector("small").textContent = `${e.author} · @${e.key}`;
+      b.onclick = () => { $("cite").close(); insert(`[@${e.key}]`); };
+      list.append(b);
+    }
+  };
+  $("cite-search").value = "";
+  $("cite-search").oninput = () => render($("cite-search").value);
+  render("");
+  $("cite").showModal();
+}
+$("cite-close").onclick = () => $("cite").close();
+
+// ---------------------------------------------------------------- preview & problems
 async function poll() {
   try {
-    const st = await (await api("/api/status")).json();
-    if (st.building) setStatus("Δημιουργία…");
-    if (st.version !== version && !st.building) {
-      version = st.version;
-      renderPreview(st);
-    }
-  } catch (e) {
-    setStatus("Ο server σταμάτησε", true);
-  }
+    const st = await api("/api/status");
+    if (st.building) setStatus("Ενημέρωση σελίδων…", "busy");
+    else if (st.version !== version) { version = st.version; render(st); }
+  } catch (e) { setStatus("Η εφαρμογή έκλεισε — ξεκίνα την ξανά", "err"); }
   setTimeout(poll, 600);
 }
 
-function renderPreview(st) {
+function render(st) {
   if (st.title) { $("book-title").textContent = st.title; document.title = st.title + " · greekbook"; }
   const preview = $("preview");
   const scroll = preview.scrollTop;
+  preview.querySelectorAll(".message").forEach(e => e.remove());
   if (!st.ok) {
-    setStatus("Σφάλμα", true);
-    preview.textContent = "";
+    setStatus("Χρειάζεται διόρθωση", "err");
     const box = document.createElement("div");
-    box.className = "error-box";
-    box.textContent = st.error;
-    preview.append(box);
+    box.className = "message err";
+    box.innerHTML = "<b>Οι σελίδες δεν ενημερώθηκαν</b><span></span>";
+    box.querySelector("span").textContent = st.error;
+    preview.insertBefore(box, preview.children[1] || null);
   } else {
-    setStatus(`${st.pages} σελίδες · ${st.seconds}s`);
+    setStatus(dirty ? "Αποθήκευση…" : `Αποθηκεύτηκε · ${st.pages} σελίδες`, dirty ? "busy" : "");
     const imgs = [...preview.querySelectorAll("img")];
-    preview.querySelectorAll(".error-box").forEach(e => e.remove());
     for (let i = 0; i < st.pages; i++) {
       const img = imgs[i] || preview.appendChild(document.createElement("img"));
       img.alt = `Σελίδα ${i + 1}`;
@@ -192,14 +520,33 @@ function renderPreview(st) {
     imgs.slice(st.pages).forEach(img => img.remove());
     preview.scrollTop = scroll;
   }
-  const issues = $("issues");
-  issues.textContent = "";
-  for (const i of [...st.issues, ...st.diagnostics.map(d => ({message: d, level: "warning"}))]) {
-    const d = document.createElement("div");
-    d.className = i.level;
-    d.textContent = i.file ? `${i.file}:${i.line} — ${i.message}` : i.message;
-    if (i.file) d.onclick = () => jumpTo(i.file, i.line);
-    issues.append(d);
+  renderProblems([...st.issues, ...st.diagnostics.map(d => ({message: d, level: "warning"}))]);
+}
+
+function renderProblems(items) {
+  const list = $("problem-list");
+  list.textContent = "";
+  $("problems-title").textContent = items.length ? `Έλεγχος κειμένου · ${items.length} ${items.length === 1 ? "παρατήρηση" : "παρατηρήσεις"}` : "Έλεγχος κειμένου · όλα καλά ✓";
+  for (const p of items) {
+    const row = document.createElement("div");
+    row.className = "problem " + p.level;
+    row.innerHTML = `<span class="icon">${p.level === "error" ? "●" : "▲"}</span><span class="msg"></span>`;
+    row.querySelector(".msg").textContent = p.message;
+    if (p.file) {
+      const w = document.createElement("span");
+      w.className = "where"; w.textContent = `γραμμή ${p.line}`;
+      w.title = p.file; w.onclick = () => jumpTo(p.file, p.line);
+      row.prepend(w);
+    }
+    const word = (p.message.match(/«([^»]+)» έχει λατινικούς/) || [])[1];
+    if (word && p.file) {
+      const fix = document.createElement("button");
+      fix.textContent = "Διόρθωση";
+      fix.title = "Αντικατάσταση των λατινικών γραμμάτων με ελληνικά";
+      fix.onclick = () => fixWord(p.file, p.line, word);
+      row.append(fix);
+    }
+    list.append(row);
   }
 }
 
@@ -210,38 +557,124 @@ async function jumpTo(file, line) {
   const start = lines.slice(0, Math.max(line - 1, 0)).join("\n").length + (line > 1 ? 1 : 0);
   ta.focus();
   ta.setSelectionRange(start, start + (lines[line - 1] || "").length);
-  ta.scrollTop = (line - 5) * parseFloat(getComputedStyle(ta).lineHeight);
+  ta.scrollTop = Math.max(0, (line - 5) * parseFloat(getComputedStyle(ta).lineHeight));
 }
 
-function insertText(before, after = "") {
+async function fixWord(file, line, word) {
+  if (file !== current) await openFile(file);
+  const fixed = [...word].map(c => LOOKALIKE[c] || c).join("");
   const ta = $("text");
-  const [s, e] = [ta.selectionStart, ta.selectionEnd];
-  const selected = ta.value.slice(s, e);
-  ta.setRangeText(before + selected + after, s, e, "end");
-  if (!selected && after) ta.setSelectionRange(s + before.length, s + before.length);
-  ta.dispatchEvent(new Event("input"));
-  ta.focus();
+  const lines = ta.value.split("\n");
+  if (lines[line - 1] !== undefined) {
+    lines[line - 1] = lines[line - 1].replace(word, fixed);
+    ta.value = lines.join("\n");
+    ta.dispatchEvent(new Event("input"));
+    toast(`«${word}» → «${fixed}»`);
+  }
 }
 
-$("text").addEventListener("input", () => {
-  dirty = true;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(save, 600);
+// ---------------------------------------------------------------- settings
+function getKey(obj, key) { return key.split(".").reduce((o, k) => (o || {})[k], obj); }
+function setKey(obj, key, value) {
+  const parts = key.split("."); let o = obj;
+  for (const p of parts.slice(0, -1)) o = (o[p] ||= {});
+  o[parts.at(-1)] = value;
+}
+async function openSettings() {
+  const data = await api("/api/config");
+  config = data.config;
+  chosenTemplate = config.template || "novel";
+  for (const el of document.querySelectorAll("#settings [data-key]")) {
+    const v = getKey(config, el.dataset.key);
+    if (el.type === "checkbox") el.checked = el.dataset.on ? v === el.dataset.on : (v === undefined ? el.dataset.default === "true" || (el.dataset.key === "toc" && ["thesis", "academic"].includes(chosenTemplate)) : !!v);
+    else if (el.dataset.list) el.value = (v || []).join("\n");
+    else el.value = v ?? (el.tagName === "SELECT" ? el.options[0].value : "");
+  }
+  const box = $("templates");
+  box.textContent = "";
+  for (const [name, [label, desc]] of Object.entries(TEMPLATES)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tpl" + (name === chosenTemplate ? " on" : "");
+    b.innerHTML = `<img alt="" src="/img/${name}.png"><b></b><span></span>`;
+    b.querySelector("b").textContent = label; b.querySelector("span").textContent = desc;
+    b.onclick = () => { chosenTemplate = name; box.querySelectorAll(".tpl").forEach(x => x.classList.toggle("on", x === b)); showTabs(); };
+    box.append(b);
+  }
+  showTabs();
+  $("settings-error").textContent = "";
+  $("settings").showModal();
+}
+function showTabs() {
+  const thesis = chosenTemplate === "thesis";
+  $("tab-thesis").style.display = thesis ? "" : "none";
+  $("tab-book").style.display = ["novel", "classic", "sepia"].includes(chosenTemplate) ? "" : "none";
+}
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.tab === b.dataset.tab));
 });
+$("settings-btn").onclick = openSettings;
+$("settings-cancel").onclick = () => $("settings").close();
+$("settings-save").onclick = async () => {
+  const next = structuredClone(config);
+  next.template = chosenTemplate;
+  for (const el of document.querySelectorAll("#settings [data-key]")) {
+    let v;
+    if (el.type === "checkbox") v = el.dataset.on ? (el.checked ? el.dataset.on : el.dataset.off) : el.checked;
+    else if (el.dataset.list) v = el.value.split("\n").map(s => s.trim()).filter(Boolean);
+    else v = el.value.trim();
+    if (el.dataset.key.startsWith("thesis.") && chosenTemplate !== "thesis" && !config.thesis) continue;
+    // keep book.yaml tidy: don't write defaults the user never changed
+    const def = el.dataset.key === "toc" ? ["thesis", "academic"].includes(chosenTemplate) : DEFAULTS[el.dataset.key];
+    if (getKey(config, el.dataset.key) === undefined && (v === "" || v === def || (v === false && def === undefined))) continue;
+    setKey(next, el.dataset.key, v);
+  }
+  if (next.page_size === "") delete next.page_size;
+  try { await api("/api/config", {method: "PUT", body: JSON.stringify(next)}); config = next; $("settings").close(); toast("Οι ρυθμίσεις αποθηκεύτηκαν"); await loadFiles(current); }
+  catch (e) { $("settings-error").textContent = e.message; }
+};
+$("logo-btn").onclick = () => $("logo-input").click();
+$("logo-input").onchange = async () => {
+  const f = $("logo-input").files[0];
+  if (!f) return;
+  try {
+    const {markdown} = await api("/api/image?for=", {method: "POST", body: await f.arrayBuffer(), headers: {"X-Filename": encodeURIComponent(f.name)}});
+    document.querySelector('[data-key="thesis.logo"]').value = markdown.match(/\]\(([^)]+)\)/)[1];
+  } catch (e) { $("settings-error").textContent = e.message; }
+  $("logo-input").value = "";
+};
+$("raw-yaml").onclick = async (e) => { e.preventDefault(); $("settings").close(); await openFile("book.yaml"); };
+
+// ---------------------------------------------------------------- misc
+$("text").addEventListener("input", () => { dirty = true; setStatus("Αποθήκευση…", "busy"); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 700); });
 $("text").addEventListener("keydown", (ev) => {
   if (!(ev.ctrlKey || ev.metaKey)) return;
   const k = ev.key.toLowerCase();
-  if (k === "s") { ev.preventDefault(); save(); }
-  if (k === "b") { ev.preventDefault(); insertText("**", "**"); }
-  if (k === "i") { ev.preventDefault(); insertText("*", "*"); }
+  if (k === "s") { ev.preventDefault(); flush(); }
+  if (k === "b") { ev.preventDefault(); ACTIONS.bold(); }
+  if (k === "i") { ev.preventDefault(); ACTIONS.italic(); }
 });
-document.querySelectorAll("[data-wrap]").forEach(b => b.onclick = () => insertText(b.dataset.wrap, b.dataset.wrap));
-document.querySelectorAll("[data-insert]").forEach(b => b.onclick = () => insertText(b.dataset.insert));
 $("zoom-in").onclick = () => { zoom = Math.min(zoom + 80, 1400); $("preview").style.setProperty("--zoom", zoom + "px"); };
 $("zoom-out").onclick = () => { zoom = Math.max(zoom - 80, 240); $("preview").style.setProperty("--zoom", zoom + "px"); };
-window.addEventListener("beforeunload", () => { if (dirty) save(); });
+$("download-btn").onclick = (e) => { e.stopPropagation(); $("download-menu").classList.toggle("open"); };
+document.addEventListener("click", () => $("download-menu").classList.remove("open"));
+$("help-btn").onclick = () => $("help").showModal();
+$("help-close").onclick = () => $("help").close();
+$("tour-btn").onclick = () => { $("help").close(); $("welcome").showModal(); };
+$("welcome-ok").onclick = () => { $("welcome").close(); try { localStorage.setItem("gb-welcome", "1"); } catch {} };
+$("home").onclick = async () => { await flush(); await post("/api/projects/close", {}); location.href = "/"; };
+window.addEventListener("beforeunload", (e) => { if (dirty) { flush(); e.preventDefault(); } });
 
-loadFiles().then(poll).catch(e => setStatus(String(e), true));
+(async () => {
+  try {
+    config = (await api("/api/config")).config;
+    await loadFiles();
+    poll();
+    let seen = null; try { seen = localStorage.getItem("gb-welcome"); } catch {}
+    if (!seen) $("welcome").showModal();
+  } catch (e) { setStatus(e.message, "err"); }
+})();
 </script>
 </body>
 </html>

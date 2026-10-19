@@ -31,7 +31,8 @@ theme:
 
 nav:
   - Αρχική: index.md
-  - Ξεκίνημα: egkatastasi.md
+  - Για όλους (χωρίς προγραμματισμό): gia-olous.md
+  - Ξεκίνημα με Python: egkatastasi.md
   - Οδηγός πτυχιακής: ptyxiaki.md
   - Γράψιμο σε Markdown: grafi.md
   - Ρυθμίσεις (book.yaml): rythmiseis.md

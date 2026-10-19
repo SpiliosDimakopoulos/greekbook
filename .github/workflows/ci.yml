@@ -17,8 +17,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
-      - run: ruff check src tests scripts site
-      - run: ruff format --check src tests scripts site
+      - run: ruff check src tests scripts site packaging
+      - run: ruff format --check src tests scripts site packaging
       - run: mypy
 
   test:
@@ -70,3 +70,19 @@ jobs:
           python-version: "3.12"
       - run: pip install -e . "mkdocs-material>=9.5,<10"
       - run: python scripts/build_site.py --out _site
+
+  standalone:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install ".[docx]" pyinstaller
+      - run: python packaging/build_exe.py
+      - name: Smoke test the executable
+        shell: bash
+        run: |
+          ./dist/greekbook.exe --version
+          ./dist/greekbook.exe doctor
+          ./dist/greekbook.exe new smoke -t novel && ./dist/greekbook.exe build smoke --epub
