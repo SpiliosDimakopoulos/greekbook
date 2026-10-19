@@ -7,7 +7,7 @@ name = "greekbook"
 dynamic = ["version"]
 description = "Markdown to beautifully typeset Greek books and theses (PDF, PDF/A, EPUB) — no LaTeX required."
 readme = "README.md"
-license = "LicenseRef-MIT-Commons-Clause"
+license = "MIT"
 license-files = ["LICENSE", "src/greekbook/fonts/LICENSES.txt"]
 requires-python = ">=3.10"
 authors = [{ name = "Spilios Dimakopoulos" }]
@@ -29,7 +29,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Text Processing :: Markup :: Markdown",
-    "License :: Other/Proprietary License",
     "Topic :: Printing",
     "Typing :: Typed",
 ]

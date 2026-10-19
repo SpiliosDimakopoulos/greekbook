@@ -22,6 +22,8 @@ A rewrite on top of [Typst](https://typst.app).
 - Test suite (unit, end-to-end PDF, property-based), CI on three OSes.
 
 ### Changed
+- License: plain MIT (the Commons Clause, which forbade selling and made the
+  project non open source, was dropped).
 - `theme:` is now `template:` and `parts/` is now `chapters/`; old projects still load.
 - The syllabifier follows the school-grammar rule for consonant clusters
   (82 % → 100 % on the gold list).

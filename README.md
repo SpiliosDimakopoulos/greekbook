@@ -215,5 +215,5 @@ see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-Code: see [LICENSE](LICENSE). Bundled fonts: SIL Open Font License / Bitstream Vera
+Code: [MIT](LICENSE). Bundled fonts: SIL Open Font License / Bitstream Vera
 (see `src/greekbook/fonts`). Bundled mitex: Apache-2.0.
