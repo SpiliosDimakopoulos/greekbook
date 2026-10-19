@@ -48,7 +48,7 @@ PDF, PDF/A και EPUB, χωρίς LaTeX και χωρίς μάχες με το 
 ## Σε τρεις εντολές
 
 ```console
-$ pip install git+https://github.com/SpiliosDimakopoulos/greekbook
+$ pip install greekbook
 $ greekbook new η-πτυχιακή-μου --template thesis
 $ greekbook serve η-πτυχιακή-μου
 ```

@@ -13,7 +13,7 @@ PDF, PDF/A και EPUB, χωρίς LaTeX και χωρίς μάχες με το 
 μηχανή [Typst](https://typst.app), με τους κανόνες της ελληνικής τυπογραφίας ενσωματωμένους.
 
 ```console
-$ pip install git+https://github.com/SpiliosDimakopoulos/greekbook
+$ pip install greekbook
 $ greekbook new η-πτυχιακή-μου --template thesis
 $ greekbook watch η-πτυχιακή-μου
 ```

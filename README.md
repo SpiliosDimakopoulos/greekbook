@@ -5,6 +5,7 @@
 **Write in Markdown. Get a properly typeset Greek book or thesis.**
 <br>PDF, PDF/A and EPUB, without LaTeX and without fighting Word.
 
+[![PyPI](https://img.shields.io/pypi/v/greekbook)](https://pypi.org/project/greekbook/)
 [![CI](https://github.com/SpiliosDimakopoulos/greekbook/actions/workflows/ci.yml/badge.svg)](https://github.com/SpiliosDimakopoulos/greekbook/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20%E2%80%93%203.13-blue)
 ![Typst](https://img.shields.io/badge/engine-Typst-239dad)
@@ -26,7 +27,7 @@ produces a book or thesis set with a modern typesetting engine
 ([Typst](https://typst.app)) and with the Greek-specific rules built in.
 
 ```console
-$ pip install git+https://github.com/SpiliosDimakopoulos/greekbook
+$ pip install greekbook
 $ greekbook new my-thesis --template thesis
 $ greekbook build my-thesis --pdfa
 ✓ PDF: my-thesis/thesis.pdf  (0.4s)

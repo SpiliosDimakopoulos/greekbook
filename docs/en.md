@@ -5,7 +5,7 @@ using [Typst](https://typst.app), with Greek typography built in: hyphenation an
 justification, nested «“…”» quotes, accentless capitals (τσάι → ΤΣΑΪ), Greek numerals,
 and case-aware cross-references. English-language books work too (`language: en`).
 
-- **Install:** `pip install git+https://github.com/SpiliosDimakopoulos/greekbook`
+- **Install:** `pip install greekbook`
 - **Start:** `greekbook new my-thesis --template thesis && greekbook serve my-thesis`
 - **Try without installing:** the [in-browser demo](demo/) runs the same Python code in
   Pyodide and Typst as WebAssembly.

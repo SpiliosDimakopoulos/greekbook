@@ -6,7 +6,7 @@
 LaTeX ούτε άλλη εγκατάσταση: οι γραμματοσειρές και η μηχανή Typst έρχονται μαζί.
 
 ```console
-$ pip install git+https://github.com/SpiliosDimakopoulos/greekbook
+$ pip install greekbook
 $ greekbook doctor
 ✓ greekbook 0.2.0, Python 3.12
 ✓ Typst, πρότυπα και μαθηματικά (LaTeX) λειτουργούν
@@ -14,7 +14,7 @@ $ greekbook doctor
 
 !!! tip "Εισαγωγή από Word"
     Για την εντολή `greekbook import` εγκατέστησε και την προαιρετική υποστήριξη:
-    `pip install "greekbook[docx] @ git+https://github.com/SpiliosDimakopoulos/greekbook"`.
+    `pip install "greekbook[docx]"`.
 
 ## Το πρώτο σου βιβλίο
 
