@@ -25,7 +25,7 @@ jobs:
     permissions:
       id-token: write  # PyPI trusted publishing, no API token stored
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
@@ -45,7 +45,7 @@ jobs:
       - run: |
           greekbook new thesis -t thesis && greekbook build thesis --pdfa -o greekbook-sample-thesis.pdf
           greekbook new novel -t novel && greekbook build novel --epub -o greekbook-sample-novel.pdf
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
