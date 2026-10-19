@@ -17,8 +17,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
-      - run: ruff check src tests
-      - run: ruff format --check src tests
+      - run: ruff check src tests scripts site
+      - run: ruff format --check src tests scripts site
       - run: mypy
 
   test:
@@ -60,3 +60,13 @@ jobs:
             thesis/thesis.pdf
             novel/novel.pdf
             novel/novel.epub
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e . "mkdocs-material>=9.5,<10"
+      - run: python scripts/build_site.py --out _site

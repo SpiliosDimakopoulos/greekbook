@@ -23,6 +23,7 @@ A rewrite on top of [Typst](https://typst.app).
 - `greekbook serve`: local editor with live page preview and lint panel, bound to
   127.0.0.1 with Host and token checks.
 - EPUB 3 with soft hyphens from the Greek syllabifier.
+- In-browser demo (Pyodide + typst.ts) and Greek documentation site on GitHub Pages.
 - Test suite (unit, end-to-end PDF, property-based), CI on three OSes.
 
 ### Changed

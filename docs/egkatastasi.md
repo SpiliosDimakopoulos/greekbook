@@ -1,0 +1,50 @@
+# Ξεκίνημα
+
+## Εγκατάσταση
+
+Χρειάζεσαι Python 3.10 ή νεότερη, σε Windows, macOS ή Linux. Δεν χρειάζεται
+LaTeX ούτε άλλη εγκατάσταση: οι γραμματοσειρές και η μηχανή Typst έρχονται μαζί.
+
+```console
+$ pip install git+https://github.com/SpiliosDimakopoulos/greekbook
+$ greekbook doctor
+✓ greekbook 0.2.0, Python 3.12
+✓ Typst, πρότυπα και μαθηματικά (LaTeX) λειτουργούν
+```
+
+!!! tip "Εισαγωγή από Word"
+    Για την εντολή `greekbook import` εγκατέστησε και την προαιρετική υποστήριξη:
+    `pip install "greekbook[docx] @ git+https://github.com/SpiliosDimakopoulos/greekbook"`.
+
+## Το πρώτο σου βιβλίο
+
+```console
+$ greekbook new το-βιβλίο-μου --template novel
+$ cd το-βιβλίο-μου
+$ greekbook build --open
+```
+
+Το `new` φτιάχνει ένα έτοιμο project που ήδη δουλεύει. Άλλαξέ το σιγά σιγά:
+
+```
+το-βιβλίο-μου/
+├── book.yaml        ← τίτλος, συγγραφέας, πρότυπο
+└── chapters/
+    ├── 01.md        ← ένα αρχείο ανά κεφάλαιο, με σειρά ονόματος
+    └── 02.md
+```
+
+Κάθε κεφάλαιο ξεκινά με μια επικεφαλίδα `# Τίτλος`. Το υπόλοιπο είναι απλό κείμενο:
+κενή γραμμή για νέα παράγραφο, `*πλάγια*`, `**έντονα**`, `"εισαγωγικά"`.
+
+## Δουλεύοντας
+
+| Θέλεις να… | Εντολή |
+|---|---|
+| γράφεις και να βλέπεις τις σελίδες ζωντανά | `greekbook serve` |
+| ξαναφτιάχνεται το PDF σε κάθε αποθήκευση (με δικό σου editor) | `greekbook watch` |
+| ελέγξεις για λάθη πριν την παράδοση | `greekbook validate` |
+| βγάλεις PDF/A για το αποθετήριο | `greekbook build --pdfa` |
+| βγάλεις και e-book | `greekbook build --epub` |
+
+Συνέχισε με τον [οδηγό πτυχιακής](ptyxiaki.md) ή δες όλη τη [σύνταξη](grafi.md).

@@ -16,3 +16,4 @@ htmlcov/
 src/greekbook/starters/**/*.pdf
 src/greekbook/starters/**/*.epub
 src/greekbook/starters/**/*.typ
+_site/

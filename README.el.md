@@ -3,7 +3,7 @@
 **Γράφεις σε Markdown. Παίρνεις σωστά στοιχειοθετημένο ελληνικό βιβλίο ή πτυχιακή.**
 PDF, PDF/A και EPUB, χωρίς LaTeX και χωρίς μάχες με το Word.
 
-[English](README.md)
+**[▶ Δοκίμασέ το στον browser](https://spiliosdimakopoulos.github.io/greekbook/demo/)** · [Τεκμηρίωση](https://spiliosdimakopoulos.github.io/greekbook/) · [English](README.md)
 
 <img src="docs/images/thesis.png" alt="Σελίδες δείγματος πτυχιακής" width="100%">
 

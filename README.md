@@ -10,7 +10,9 @@
 ![Typst](https://img.shields.io/badge/engine-Typst-239dad)
 ![mypy](https://img.shields.io/badge/mypy-strict-2a6db2)
 
-[Ελληνικά](README.el.md) · [Quick start](#quick-start) · [Writing](#writing) · [Templates](#templates) · [Greek typography](#greek-typography)
+**[▶ Try it in your browser](https://spiliosdimakopoulos.github.io/greekbook/demo/)** · [Documentation (Greek)](https://spiliosdimakopoulos.github.io/greekbook/) · [Ελληνικά](README.el.md)
+
+[Quick start](#quick-start) · [Writing](#writing) · [Templates](#templates) · [Greek typography](#greek-typography)
 
 <img src="docs/images/thesis.png" alt="Pages of a sample thesis typeset by greekbook: cover, chapters with equations, a figure and a table" width="100%">
 
@@ -47,8 +49,12 @@ $ greekbook build my-thesis --pdfa
 - **A linter for invisible mistakes**: Latin letters hiding inside Greek words,
   a medial ς, unpaired quotes, citations missing from the bibliography,
   references to labels that don't exist, missing images.
+- **A live editor and Word import.** `greekbook serve` opens an editor with the
+  pages rendering next to your text; `greekbook import` turns a `.docx` into a project.
 - **Fast and self-contained**: one `pip install`, no TeX distribution, fonts
-  bundled, rebuilds in under a second, works offline.
+  bundled, rebuilds in under a second, works offline. The
+  [browser demo](https://spiliosdimakopoulos.github.io/greekbook/demo/) runs the very
+  same Python code in Pyodide, with Typst compiled to WebAssembly.
 
 ## Quick start
 
@@ -76,7 +82,9 @@ my-thesis/
 |---|---|
 | `greekbook new DIR -t thesis\|novel` | Start a project from a working example |
 | `greekbook build [DIR] [--epub] [--pdfa] [--open]` | Build the PDF (and EPUB) |
+| `greekbook serve [DIR]` | Local editor with live page preview |
 | `greekbook watch [DIR]` | Rebuild on every change |
+| `greekbook import FILE.docx [DIR]` | Turn a Word document into a project |
 | `greekbook validate [DIR] [--strict]` | Check text, citations, references and images |
 | `greekbook doctor` | Check the installation |
 | `greekbook templates` | List the templates |
