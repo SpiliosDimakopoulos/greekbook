@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: If you use greekbook for a publication, please cite it.
+title: "greekbook: Markdown to typeset Greek books and theses"
+type: software
+authors:
+  - family-names: Dimakopoulos
+    given-names: Spilios
+repository-code: https://github.com/SpiliosDimakopoulos/greekbook
+license-url: https://github.com/SpiliosDimakopoulos/greekbook/blob/main/LICENSE
+keywords: [Greek, typesetting, Typst, Markdown, thesis]

@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests scripts site
+      - run: ruff format --check src tests scripts site
+      - run: mypy
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e ".[dev]"
+      - run: pytest --cov --cov-report=xml --cov-fail-under=90
+      - run: greekbook doctor
+
+  samples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Build the sample thesis and novel
+        run: |
+          greekbook new thesis -t thesis && greekbook validate thesis --strict && greekbook build thesis --pdfa
+          greekbook new novel -t novel && greekbook validate novel --strict && greekbook build novel --epub
+      - name: Validate the EPUB with epubcheck
+        run: |
+          sudo apt-get install -y -qq epubcheck
+          epubcheck novel/novel.epub
+      - uses: actions/upload-artifact@v5
+        with:
+          name: samples
+          path: |
+            thesis/thesis.pdf
+            novel/novel.pdf
+            novel/novel.epub
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e . "mkdocs-material>=9.5,<10"
+      - run: python scripts/build_site.py --out _site

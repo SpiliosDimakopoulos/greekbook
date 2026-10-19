@@ -1,0 +1,7 @@
+[package]
+name = "greekbook"
+version = "0.2.0"
+entrypoint = "lib.typ"
+authors = ["Spilios Dimakopoulos"]
+license = "MIT"
+description = "Templates and Greek typography helpers used by the greekbook CLI."

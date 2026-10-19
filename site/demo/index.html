@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>greekbook · δοκίμασέ το στον browser</title>
+<meta name="description" content="Γράψε Markdown και δες ελληνικό βιβλίο ή πτυχιακή στοιχειοθετημένη με Typst, απευθείας στον browser.">
+<style>
+:root {
+  --bg: #f6f4f0; --panel: #ffffff; --ink: #1d1b18; --muted: #6f6a62; --line: #e3ded5;
+  --accent: #0b6e75; --accent-soft: #e2f1f1; --err: #b3261e; --page-bg: #d9d4cb;
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  --sans: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #171614; --panel: #1f1e1b; --ink: #ece8e1; --muted: #a29c92; --line: #34312c;
+          --accent: #5cc1c7; --accent-soft: #1f3a3b; --err: #ff8a80; --page-bg: #2a2825; }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); display: grid; grid-template-rows: auto 1fr; }
+header { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--line);
+         background: var(--panel); flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; }
+header h1 a { color: inherit; text-decoration: none; }
+header .tag { color: var(--muted); }
+.spacer { flex: 1; }
+select, button, .btn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+                       padding: 5px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; }
+button:hover, .btn:hover { border-color: var(--accent); color: var(--accent); }
+button:disabled { opacity: .5; cursor: default; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pill.err { color: var(--err); }
+main { display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
+textarea { width: 100%; height: 100%; resize: none; border: 0; border-right: 1px solid var(--line); outline: none;
+           padding: 18px 22px; background: var(--panel); color: var(--ink); font: 14.5px/1.7 var(--mono); }
+.preview { overflow: auto; background: var(--page-bg); padding: 18px; }
+.preview svg { display: block; width: 100%; max-width: 640px; height: auto; margin: 0 auto; }
+.preview .typst-page { fill: #fff; }
+.message { max-width: 520px; margin: 40px auto; background: var(--panel); padding: 18px 20px; border-radius: 10px;
+           white-space: pre-wrap; }
+.message.err { color: var(--err); font: 13px var(--mono); }
+.progress { height: 3px; background: var(--accent); width: 0; transition: width .3s; position: fixed; top: 0; left: 0; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; grid-template-rows: 45vh 1fr; } }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<header>
+  <h1><a href="../">greekbook</a></h1>
+  <span class="tag">Markdown → ελληνικό βιβλίο, στον browser σου</span>
+  <span class="spacer"></span>
+  <label>Δείγμα <select id="sample">
+    <option value="novel">Διήγημα</option>
+    <option value="thesis">Πτυχιακή</option>
+  </select></label>
+  <label>Πρότυπο <select id="template">
+    <option>novel</option><option>classic</option><option>sepia</option>
+    <option>clean</option><option>academic</option><option>thesis</option>
+  </select></label>
+  <span class="pill" id="status">Φόρτωση…</span>
+  <button id="pdf" disabled>Λήψη PDF</button>
+  <a class="btn" href="https://github.com/SpiliosDimakopoulos/greekbook">GitHub</a>
+</header>
+<main>
+  <textarea id="text" spellcheck="true" lang="el" disabled aria-label="Κείμενο σε Markdown"></textarea>
+  <section class="preview" id="preview">
+    <div class="message">Φορτώνεται το greekbook (Python μέσω Pyodide) και το Typst (WebAssembly).
+Την πρώτη φορά κατεβαίνουν περίπου 25&nbsp;MB· μετά μένουν στην cache.</div>
+  </section>
+</main>
+<script type="module" src="demo.js"></script>
+</body>
+</html>

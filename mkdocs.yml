@@ -1,0 +1,59 @@
+site_name: greekbook
+site_description: Markdown → καλαίσθητα ελληνικά βιβλία και πτυχιακές (PDF, PDF/A, EPUB), χωρίς LaTeX.
+site_url: https://spiliosdimakopoulos.github.io/greekbook/
+repo_url: https://github.com/SpiliosDimakopoulos/greekbook
+repo_name: SpiliosDimakopoulos/greekbook
+edit_uri: edit/main/docs/
+copyright: MIT License · © 2026 Spilios Dimakopoulos
+
+theme:
+  name: material
+  language: el
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle: {icon: material/weather-night, name: Σκούρο θέμα}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle: {icon: material/weather-sunny, name: Φωτεινό θέμα}
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Αρχική: index.md
+  - Ξεκίνημα: egkatastasi.md
+  - Οδηγός πτυχιακής: ptyxiaki.md
+  - Γράψιμο σε Markdown: grafi.md
+  - Ρυθμίσεις (book.yaml): rythmiseis.md
+  - Πρότυπα: protypa.md
+  - Ελληνική τυπογραφία: typografia.md
+  - Εργαλεία: ergaleia.md
+  - Συχνές ερωτήσεις: faq.md
+  - English: en.md
+  - Demo στον browser: https://spiliosdimakopoulos.github.io/greekbook/demo/
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc: {permalink: true}
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight: {anchor_linenums: true}
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed: {alternate_style: true}
+
+validation:
+  links:
+    unrecognized_links: ignore

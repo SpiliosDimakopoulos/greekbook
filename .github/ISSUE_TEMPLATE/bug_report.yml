@@ -1,0 +1,20 @@
+name: Bug report / Αναφορά σφάλματος
+description: Something renders wrong or a command fails.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / Τι συνέβη;
+      description: Include the Markdown that triggers it if you can (a few lines are enough).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect? / Τι περίμενες;
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `greekbook doctor`
+      render: text

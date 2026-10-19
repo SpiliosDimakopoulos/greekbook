@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" font-family="sans-serif">
+  <rect width="400" height="260" fill="#ffffff"/>
+  <g fill="none" stroke-width="2.5">
+    <polyline points="200,130 120,60 60,90 80,170 200,130" stroke="#0b6e75"/>
+    <polyline points="200,130 260,40 340,70 320,120 200,130" stroke="#c2410c"/>
+    <polyline points="200,130 300,200 220,230 140,215 200,130" stroke="#6d28d9"/>
+  </g>
+  <g fill="#333">
+    <circle cx="120" cy="60" r="5"/><circle cx="60" cy="90" r="5"/><circle cx="80" cy="170" r="5"/>
+    <circle cx="260" cy="40" r="5"/><circle cx="340" cy="70" r="5"/><circle cx="320" cy="120" r="5"/>
+    <circle cx="300" cy="200" r="5"/><circle cx="220" cy="230" r="5"/><circle cx="140" cy="215" r="5"/>
+  </g>
+  <rect x="190" y="120" width="20" height="20" fill="#111"/>
+  <text x="215" y="118" font-size="13">αποθήκη</text>
+</svg>
