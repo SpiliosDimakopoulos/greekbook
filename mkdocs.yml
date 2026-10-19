@@ -54,9 +54,6 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.tabbed: {alternate_style: true}
 
-not_in_nav: |
-  /launch.md
-
 validation:
   links:
     unrecognized_links: ignore

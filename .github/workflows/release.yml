@@ -57,3 +57,23 @@ jobs:
             greekbook-sample-thesis.pdf
             greekbook-sample-novel.pdf
             greekbook-sample-novel.epub
+
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/spiliosdimakopoulos/greekbook:latest
+            ghcr.io/spiliosdimakopoulos/greekbook:${{ github.ref_name }}
