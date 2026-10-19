@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -25,7 +25,7 @@ jobs:
     permissions:
       id-token: write  # PyPI trusted publishing, no API token stored
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
@@ -41,7 +41,7 @@ jobs:
             asset: greekbook-macos.zip
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -71,7 +71,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -79,16 +79,16 @@ jobs:
       - run: |
           greekbook new thesis -t thesis && greekbook build thesis --pdfa -o greekbook-sample-thesis.pdf
           greekbook new novel -t novel && greekbook build novel --epub -o greekbook-sample-novel.pdf
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           pattern: greekbook-*
           merge-multiple: true
           path: standalone/
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
           files: |
@@ -104,13 +104,13 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           push: true
