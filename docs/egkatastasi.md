@@ -11,7 +11,7 @@ LaTeX ούτε άλλη εγκατάσταση: οι γραμματοσειρέ�
 ```console
 $ pip install greekbook
 $ greekbook doctor
-✓ greekbook 0.2.0, Python 3.12
+✓ greekbook 0.3.0, Python 3.12
 ✓ Typst, πρότυπα και μαθηματικά (LaTeX) λειτουργούν
 ```
 

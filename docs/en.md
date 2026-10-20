@@ -6,7 +6,7 @@ justification, nested «“…”» quotes, accentless capitals (τσάι → Τ
 and case-aware cross-references. English-language books work too (`language: en`).
 
 - **Install:** `pip install greekbook`
-- **Start:** `greekbook new my-thesis --template thesis && greekbook serve my-thesis`
+- **Start:** `greekbook` (a menu) or `greekbook app` (the app in your browser)`
 - **Try without installing:** the [in-browser demo](demo/) runs the same Python code in
   Pyodide and Typst as WebAssembly.
 
